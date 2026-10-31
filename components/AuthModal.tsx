@@ -28,6 +28,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
   if (!isOpen) return null;
   // hello
+  // man
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
