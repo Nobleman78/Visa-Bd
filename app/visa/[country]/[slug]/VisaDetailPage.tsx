@@ -131,7 +131,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
 
       <main className="flex-1">
         {/* ─── Hero Banner ─── */}
-        <div className="relative h-64 md:h-80 bg-slate-900 overflow-hidden">
+        <div className="relative h-72 sm:h-64 md:h-80 w-full max-w-full bg-slate-900 overflow-hidden">
           <Image
             src={visa.image}
             alt={visa.country}
@@ -173,7 +173,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 {visa.categoryTag}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display leading-tight">
+            <h1 className="max-w-full break-words text-xl sm:text-3xl md:text-4xl font-black text-white font-display leading-tight">
               {visa.visaTitle}
             </h1>
           </div>
@@ -182,7 +182,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
         {/* ─── Quick Metrics Bar ─── */}
         <div className="bg-white border-b border-slate-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <dl className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <dl className="grid min-w-0 grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-4 sm:gap-4">
               <div className="flex items-center gap-3">
                 <span className="size-10 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
                   <Clock className="size-5" />
@@ -221,10 +221,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
         </div>
 
         {/* ─── Main Content + Sidebar ─── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-          <div className="grid lg:grid-cols-[1fr_340px] gap-10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-14">
+          <div className="grid min-w-0 lg:grid-cols-[1fr_340px] gap-8 lg:gap-10">
             {/* LEFT: Tabbed content */}
-            <div>
+            <div className="min-w-0">
               {/* Success banner after application */}
               {successId && (
                 <div className="mb-6 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-4">
@@ -250,13 +250,13 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
               )}
 
               {/* Tab Nav */}
-              <div className="flex border-b border-slate-200 bg-white rounded-t-2xl overflow-x-auto no-scrollbar">
+              <div className="flex w-full max-w-full snap-x border-b border-slate-200 bg-white rounded-t-2xl overflow-x-auto no-scrollbar overscroll-contain">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
-                    className={`py-4 px-4 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
+                    className={`snap-start shrink-0 py-3.5 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
                       activeTab === tab.key
                         ? tab.accent
                           ? 'border-amber-500 text-amber-600 bg-amber-50'
@@ -269,7 +269,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 ))}
               </div>
 
-              <div className="bg-white rounded-b-2xl border border-t-0 border-slate-200 p-6 space-y-6">
+              <div className="min-w-0 overflow-hidden bg-white rounded-b-2xl border border-t-0 border-slate-200 p-3 sm:p-6 space-y-6">
                 {/* TAB: OVERVIEW */}
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
@@ -372,7 +372,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           Government & Agency Fees
                         </h3>
                       </div>
-                      <div className="flex items-center gap-6 text-right">
+                      <div className="flex w-full items-center justify-between gap-4 text-left sm:w-auto sm:text-right">
                         <div>
                           <p className="text-xs text-slate-400">Embassy Stamping Fee</p>
                           <p className="text-sm font-bold text-white">{visa.govtFee}</p>
@@ -577,7 +577,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
 
               {/* CTA bar */}
               {activeTab !== 'apply' && (
-                <div className="mt-4 flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Shield className="size-4 text-emerald-600 shrink-0" />
                     Embassy-Accredited Pre-Screening Guaranteed
@@ -585,7 +585,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   <button
                     type="button"
                     onClick={() => setActiveTab('apply')}
-                    className="px-5 py-2.5 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl text-xs transition-colors flex items-center gap-1.5 shrink-0"
+                    className="w-full sm:w-auto justify-center px-5 py-2.5 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl text-xs transition-colors flex items-center gap-1.5 shrink-0"
                   >
                     Apply for this Work Visa <ArrowRight className="size-3.5" />
                   </button>
@@ -594,7 +594,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
             </div>
 
             {/* RIGHT: Sidebar */}
-            <aside className="space-y-5">
+            <aside className="min-w-0 space-y-5">
               {/* Call-to-action card */}
              
 
@@ -605,7 +605,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">{visa.badge || 'Visa'}</span>
                 </div>
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><BadgeCheck className="size-4 text-brand-500" />Visa type</span><span className="font-semibold text-slate-900 text-right">{visa.categoryTag}</span></div>
+                  <div className="flex min-w-0 items-start justify-between gap-4"><span className="flex shrink-0 items-center gap-2 text-slate-500"><BadgeCheck className="size-4 text-brand-500" />Visa type</span><span className="min-w-0 break-words font-semibold text-slate-900 text-right">{visa.categoryTag}</span></div>
                   <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><CalendarDays className="size-4 text-brand-500" />Validity</span><span className="font-semibold text-slate-900">{visa.validity}</span></div>
                   {visa.country === 'Malaysia' && <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><BedDouble className="size-4 text-brand-500" />Stay period</span><span className="font-semibold text-slate-900">30 Days</span></div>}
                   <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><Repeat2 className="size-4 text-brand-500" />Entry type</span><span className="font-semibold text-slate-900">{visa.country === 'Malaysia' ? 'Single Entry' : 'As stated'}</span></div>

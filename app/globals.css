@@ -38,6 +38,88 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+@media (max-width: 639px) {
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h2 {
+    font-size: 1.625rem;
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-size: 1.125rem;
+    line-height: 1.35;
+  }
+
+  h4 {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  body,
+  p {
+    font-size: 0.875rem;
+    line-height: 1.65;
+  }
+
+  .article-heading {
+    font-size: 1.625rem;
+    line-height: 1.22;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  h2 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+
+  body,
+  p {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .article-heading {
+    font-size: 2.125rem;
+    line-height: 1.18;
+  }
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {

@@ -59,8 +59,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50">
-      <div className="relative w-full max-w-md overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/50">
+      <div className="relative w-full max-w-md max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white shadow-xl">
         <div className="relative border-b border-slate-200 px-6 py-5">
           <button
             onClick={onClose}

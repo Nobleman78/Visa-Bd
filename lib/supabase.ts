@@ -1,5 +1,7 @@
 import type { WorkVisa } from '../data/visa-data';
 import type { Story } from '../data/stories-data';
+import { WORK_VISAS } from '../data/visa-data';
+import { STORIES } from '../data/stories-data';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
@@ -7,21 +9,24 @@ const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
 export const hasSupabaseConfig = Boolean(url && key);
 
 export async function fetchPublishedVisas() {
-  if (!url || !key) return [];
+  if (!url || !key) return WORK_VISAS;
 
-  const response = await fetch(`${url}/rest/v1/work_visas?select=*&order=created_at.desc`, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-  });
+  try {
+    const response = await fetch(`${url}/rest/v1/work_visas?select=*&order=created_at.desc`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
 
-  if (!response.ok) return [];
+    if (!response.ok) return WORK_VISAS;
 
-  const rows = await response.json() as Array<Record<string, unknown>>;
-  return rows.map((row) => ({
+    const rows = await response.json() as Array<Record<string, unknown>>;
+    if (!rows.length) return WORK_VISAS;
+
+    const backendVisas = rows.map((row) => ({
     id: String(row.id ?? ''),
     slug: String(row.slug ?? ''),
     countrySlug: String(row.country_slug ?? ''),
@@ -46,25 +51,42 @@ export async function fetchPublishedVisas() {
     eligibilityChecklist: Array.isArray(row.eligibility_checklist) ? row.eligibility_checklist.map(String) : [],
     requiredDocuments: Array.isArray(row.required_documents) ? row.required_documents.map(String) : [],
     applicationStages: Array.isArray(row.application_stages) ? row.application_stages.map(String) : [],
-  }));
+    }));
+
+    const backendCountries = new Set(
+      backendVisas.map((visa) => visa.country.trim().toLowerCase()),
+    );
+    return [
+      ...backendVisas,
+      ...WORK_VISAS.filter(
+        (visa) => !backendCountries.has(visa.country.trim().toLowerCase()),
+      ),
+    ];
+  } catch (error) {
+    console.error('Unable to load published visas; using local fallback data.', error);
+    return WORK_VISAS;
+  }
 }
 
 export async function fetchPublishedStories(table: 'blogs' | 'stories' = 'blogs') {
-  if (!url || !key) return [];
+  if (!url || !key) return STORIES;
 
-  const response = await fetch(`${url}/rest/v1/${table}?select=*&status=eq.Published&order=created_at.desc`, {
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-  });
+  try {
+    const response = await fetch(`${url}/rest/v1/${table}?select=*&status=eq.Published&order=created_at.desc`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
 
-  if (!response.ok) return [];
+    if (!response.ok) return STORIES;
 
-  const rows = await response.json() as Array<Record<string, unknown>>;
-  return rows.map((row) => {
+    const rows = await response.json() as Array<Record<string, unknown>>;
+    if (!rows.length) return STORIES;
+
+    return rows.map((row) => {
     const author = typeof row.author === 'object' && row.author !== null
       ? row.author as Record<string, unknown>
       : {};
@@ -85,7 +107,11 @@ export async function fetchPublishedStories(table: 'blogs' | 'stories' = 'blogs'
       publishedAt: String(row.published_at ?? ''),
       readingTime: String(row.reading_time ?? ''),
     } satisfies Story;
-  });
+    });
+  } catch (error) {
+    console.error('Unable to load published stories; using local fallback data.', error);
+    return STORIES;
+  }
 }
 
 export async function createSubmission(data: Record<string, unknown>) {

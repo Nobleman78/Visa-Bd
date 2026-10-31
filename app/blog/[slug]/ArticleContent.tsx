@@ -87,7 +87,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
               {story.category}
             </span>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 font-display tracking-tight leading-tight">
+            <h1 className="article-heading text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 font-display tracking-tight leading-tight">
               {story.title}
             </h1>
 

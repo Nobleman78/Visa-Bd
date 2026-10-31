@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import CountryFlag from "./CountryFlag";
 import { WORK_VISAS } from "../data/visa-data";
+import { fetchPublishedVisas } from "../lib/supabase";
 
 const CITIZEN_COUNTRIES = [
   { name: "Bangladesh", code: "bd" },
@@ -61,6 +62,7 @@ export default function HeroSearch() {
   const router = useRouter();
   const [citizenCountry, setCitizenCountry] = useState("Bangladesh");
   const [destinationCountry, setDestinationCountry] = useState("Japan");
+  const [visas, setVisas] = useState(WORK_VISAS);
 
   const [destMenuOpen, setDestMenuOpen] = useState(false);
   const [destSearchQuery, setDestSearchQuery] = useState("");
@@ -92,13 +94,14 @@ export default function HeroSearch() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    fetchPublishedVisas().then(setVisas);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Find the matching visa and navigate directly to its page
-    const matched = WORK_VISAS.find(
+    const liveVisas = await fetchPublishedVisas();
+    const matched = liveVisas.find(
       (v) => v.country.toLowerCase() === destinationCountry.toLowerCase(),
     );
     if (matched) {
@@ -124,7 +127,7 @@ export default function HeroSearch() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Eyebrow & Titles */}
         <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 font-display tracking-tight leading-[1.12]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-950 font-display tracking-tight leading-[1.12]">
             Find Your <span className="text-brand-700">Work Visa</span> &
             Accelerate Your Global Career
           </h1>
@@ -138,7 +141,7 @@ export default function HeroSearch() {
 
         {/* Dedicated "Find your Work Visa" Search Engine Card */}
         <div className="mt-10 lg:mt-12 max-w-4xl mx-auto">
-          <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-lift border border-slate-200/80 transition-all hover:border-brand-200">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-lift border border-slate-200/80 transition-all hover:border-brand-200">
             <form
               onSubmit={handleSubmit}
               className="flex flex-col lg:flex-row lg:items-end gap-4"
@@ -301,7 +304,7 @@ export default function HeroSearch() {
               {/* CTA Button: Check Requirements */}
               <button
                 type="submit"
-                className="h-[48px] px-8 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-2xl text-sm shadow-md hover:shadow-lift transition-all flex items-center justify-center gap-2 shrink-0 group"
+                className="h-[48px] w-full lg:w-auto px-8 bg-brand-700 hover:bg-brand-800 text-white font-bold rounded-2xl text-sm shadow-md hover:shadow-lift transition-all flex items-center justify-center gap-2 shrink-0 group"
               >
                 <span>Check Requirements</span>
                 <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
@@ -345,8 +348,8 @@ export default function HeroSearch() {
 
         {/* Stats counter bar matching Visaboo */}
         <div className="mt-14 pt-10 border-t border-slate-200/80">
-          <dl className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            <div className="flex items-center gap-4 justify-center">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left sm:text-center">
+          <div className="flex items-center gap-4 justify-start sm:justify-center">
               <span className="size-12 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
                 <Globe className="size-6" />
               </span>
@@ -360,7 +363,7 @@ export default function HeroSearch() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 justify-center">
+            <div className="flex items-center gap-4 justify-start sm:justify-center">
               <span className="size-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                 <Briefcase className="size-6" />
               </span>
@@ -374,7 +377,7 @@ export default function HeroSearch() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 justify-center">
+            <div className="flex items-center gap-4 justify-start sm:justify-center">
               <span className="size-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                 <Shield className="size-6" />
               </span>
@@ -388,7 +391,7 @@ export default function HeroSearch() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 justify-center">
+            <div className="flex items-center gap-4 justify-start sm:justify-center">
               <span className="size-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                 <Headphones className="size-6" />
               </span>

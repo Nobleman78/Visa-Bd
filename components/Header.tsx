@@ -19,6 +19,7 @@ import {
 import { POPULAR_COUNTRIES_BY_REGION, WORK_VISAS } from "../data/visa-data";
 import CountryFlag from "./CountryFlag";
 import Image from "next/image";
+import { fetchPublishedVisas } from "../lib/supabase";
 
 interface HeaderProps {
   onOpenTrackModal: () => void;
@@ -45,6 +46,7 @@ export default function Header({
   >("Asia");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [visas, setVisas] = useState(WORK_VISAS);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +67,7 @@ export default function Header({
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    fetchPublishedVisas().then(setVisas);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -102,19 +105,19 @@ export default function Header({
 
   return (
     <header className="sticky top-0 z-[100] w-full bg-[#eff6ff]">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo */}
         <Link
           href="/"
           className="flex items-center gap-2.5 shrink-0 group"
           aria-label="VisaBD Home"
         >
-          <div className="relative flex size-10 items-center justify-center rounded-lg border border-brand-800 bg-brand-900 text-white transition-transform duration-300 group-hover:-translate-y-0.5 sm:size-11">
+          <div className="relative flex size-9 items-center justify-center rounded-lg border border-brand-800 bg-brand-900 text-white transition-transform duration-300 group-hover:-translate-y-0.5 sm:size-11">
             <Compass className="size-[22px] text-white" strokeWidth={1.8} />
             <span className="absolute bottom-1 right-1 size-1.5 rounded-full bg-amber-400 ring-2 ring-brand-900" />
           </div>
           <div className="flex items-center">
-            <span className="font-display text-xl font-extrabold tracking-[-0.04em] text-slate-950 sm:text-[23px]">
+            <span className="font-display text-lg font-extrabold tracking-[-0.04em] text-slate-950 sm:text-[23px]">
               Visa<span className="text-brand-600">BD</span>
             </span>
           </div>
@@ -197,10 +200,10 @@ export default function Header({
                         <button
                           type="button"
                           role="menuitem"
-                          onClick={() => {
+                          onClick={async () => {
                             setVisaDropdownOpen(false);
-                            // Find the visa in our data and navigate to its page
-                            const match = WORK_VISAS.find(
+                            const liveVisas = await fetchPublishedVisas();
+                            const match = liveVisas.find(
                               (v: {
                                 country: string;
                                 countrySlug: string;
@@ -385,7 +388,7 @@ export default function Header({
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div
-          className="lg:hidden bg-white border-t border-slate-100 px-4 py-4 space-y-1"
+          className="lg:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain bg-white border-t border-slate-100 px-4 py-4 space-y-1 shadow-lg"
           role="dialog"
           aria-label="Mobile navigation"
         >
