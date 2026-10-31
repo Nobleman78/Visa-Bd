@@ -11,11 +11,25 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const visas = await fetchPublishedVisas();
-  return visas.map((v) => ({
-    country: v.countrySlug,
-    slug: v.slug,
-  }));
+  try {
+    const visas = await fetchPublishedVisas();
+    if (visas && visas.length > 0) {
+      return visas.map((v) => ({
+        country: v.countrySlug,
+        slug: v.slug,
+      }));
+    }
+  } catch (error) {
+    console.error('Failed to fetch published visas for static params:', error);
+  }
+
+  // Fallback to satisfy Next.js Cache Components requirement when offline/timeout
+  return [
+    {
+      country: 'japan',
+      slug: 'japan-visa',
+    },
+  ];
 }
 
 export async function generateMetadata({ params }: PageProps) {
