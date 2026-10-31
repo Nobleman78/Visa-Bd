@@ -55,7 +55,7 @@ export default function Home() {
         {/* 5. What Our Candidates Say (Testimonials) */}
         <TestimonialsSection />
 
-        {/* 6. Stay Updated on the Stories (Links to /blog/[slug] and /blog) */}
+        {/* 6. Stay Updated on the Blogs (Links to /blog/[slug] and /blog) */}
         <StoriesSection />
       </main>
 

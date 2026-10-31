@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, ArrowRight, RotateCw } from 'lucide-react';
+import { storeSupabaseSession } from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -27,31 +28,54 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
   if (!isOpen) return null;
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneNumber || phoneNumber.length < 8) return;
+    const response = await fetch('/api/auth/phone/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phoneNumber }),
+    });
+    const result = await response.json() as { demoOtp?: string; error?: string };
+    if (!response.ok) {
+      window.alert(result.error || 'Unable to send the verification code.');
+      return;
+    }
     setStep('otp');
     setCountdown(60);
-    setMockSmsBanner(`[SMS SIMULATION] VisaBD Security Code: 849201. Valid for 5 minutes.`);
+    setMockSmsBanner(`[DEMO SMS] VisaBD Security Code: ${result.demoOtp}. Valid for 5 minutes.`);
   };
 
-  const handleVerifyOtp = (e?: React.FormEvent) => {
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setIsVerifying(true);
+    const response = await fetch('/api/auth/phone/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phoneNumber, otp: otpCode }),
+    });
+    const result = await response.json() as {
+      session?: { access_token: string; refresh_token: string };
+      user?: { name: string; phone: string };
+      error?: string;
+    };
+    setIsVerifying(false);
+    if (!response.ok || !result.session || !result.user) {
+      window.alert(result.error || 'Invalid verification code.');
+      return;
+    }
+    storeSupabaseSession(result.session);
+    setStep('success');
     setTimeout(() => {
-      setIsVerifying(false);
-      setStep('success');
-      setTimeout(() => {
-        onLoginSuccess({
-          name: 'Md. Tariqul Islam',
-          phone: phoneNumber,
-          role: 'Verified Applicant',
-          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
-        });
-        onClose();
-        setStep('phone');
-      }, 1200);
-    }, 800);
+      onLoginSuccess({
+        name: result.user?.name || 'Md. Tariqul Islam',
+        phone: result.user?.phone || phoneNumber,
+        role: 'Verified Applicant',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
+      });
+      onClose();
+      setStep('phone');
+    }, 1200);
   };
 
   const autoFillCode = () => {

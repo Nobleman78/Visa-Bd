@@ -27,13 +27,14 @@ import {
   Repeat2,
   Timer,
 } from 'lucide-react';
-import { WORK_VISAS, WorkVisa } from '../../../../data/visa-data';
+import { WorkVisa } from '../../../../data/visa-data';
 import Header from '../../../../components/Header';
 import Footer from '../../../../components/Footer';
 import TrackVisaModal from '../../../../components/TrackVisaModal';
 import AuthModal from '../../../../components/AuthModal';
 import CountryFlag from '../../../../components/CountryFlag';
-import { createSubmission } from '../../../../lib/supabase';
+import { fetchPublishedVisas } from '../../../../lib/supabase';
+import { createSubmission, getStoredAccessToken, uploadSubmissionDocuments } from '../../../../lib/supabase';
 
 interface Props {
   visa: WorkVisa;
@@ -67,19 +68,28 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successId, setSuccessId] = useState('');
+  const [selectedDocuments, setSelectedDocuments] = useState<Record<string, { file: File; previewUrl: string | null }>>({});
 
-  const handleApply = (e: React.FormEvent) => {
+  const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!getStoredAccessToken()) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const trackId = `VBD-2026-${Math.floor(10000 + Math.random() * 90000)}`;
-    const documentNames = Object.fromEntries(
-      ['passport-photo', 'passport-copy', 'nid-copy', 'resume', 'education-certificates', 'experience-certificates', 'police-clearance', 'medical-report']
-        .map((name) => {
-          const file = formData.get(name);
-          return [name, file instanceof File ? file.name : null];
-        })
-    );
+    const randomPart = crypto.getRandomValues(new Uint32Array(1))[0] % 90000 + 10000;
+    const trackId = `VBD-2026-${randomPart}`;
+    let documents: Record<string, { path: string; name: string; type: string }> = {};
+    try {
+      documents = await uploadSubmissionDocuments(formData, trackId);
+      const expectedDocumentCount = Object.keys(documents).length;
+      if (expectedDocumentCount === 0) throw new Error('No documents were uploaded.');
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Documents could not be uploaded.');
+      setIsSubmitting(false);
+      return;
+    }
     createSubmission({
       tracking_id: trackId,
       name: form.name,
@@ -93,7 +103,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
       country: visa.country,
       visa_slug: visa.slug,
       visa_title: visa.visaTitle,
-      documents: documentNames,
+      documents,
       status: 'Under Review',
     }).then(() => {
       setSuccessId(trackId);
@@ -102,7 +112,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
     }).catch((error) => {
       console.error(error);
       setIsSubmitting(false);
-      window.alert('Application could not be submitted. Please check the database setup and try again.');
+      window.alert(error instanceof Error ? error.message : 'Application could not be submitted.');
     });
   };
 
@@ -118,9 +128,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
       <Header
         onOpenTrackModal={() => setIsTrackModalOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onSelectCountryVisa={(name) => {
+        onSelectCountryVisa={async (name) => {
           // navigate to the correct visa page from header dropdown
-          const match = WORK_VISAS.find(
+          const visas = await fetchPublishedVisas();
+          const match = visas.find(
             (v: WorkVisa) => v.country.toLowerCase() === name.toLowerCase()
           );
           if (match) router.push(`/visa/${match.countrySlug}/${match.slug}`);
@@ -536,9 +547,33 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                               name={name}
                               required
                               accept="image/jpeg,image/png,application/pdf"
+                              onChange={(event) => {
+                                const file = event.target.files?.[0];
+                                if (!file) return;
+                                setSelectedDocuments((current) => {
+                                  if (current[name]?.previewUrl) URL.revokeObjectURL(current[name].previewUrl);
+                                  return {
+                                    ...current,
+                                    [name]: {
+                                      file,
+                                      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+                                    },
+                                  };
+                                });
+                              }}
                               className="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-bold file:text-brand-700 hover:file:bg-brand-100"
                             />
                             <span className="mt-1.5 block text-[10px] text-slate-400">JPG, PNG or PDF</span>
+                            {selectedDocuments[name]?.previewUrl && (
+                              <img
+                                src={selectedDocuments[name].previewUrl!}
+                                alt={`Preview of ${selectedDocuments[name].file.name}`}
+                                className="mt-3 max-h-40 w-full rounded-lg border border-slate-200 bg-white object-contain"
+                              />
+                            )}
+                            {selectedDocuments[name] && (
+                              <span className="mt-2 block truncate text-[10px] font-semibold text-slate-600">{selectedDocuments[name].file.name}</span>
+                            )}
                           </label>
                         ))}
                       </div>
@@ -626,15 +661,15 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 <h4 className="text-lg font-bold text-slate-900 font-display">Your Visa Consultant</h4>
                 <div className="mt-5 flex items-center gap-4">
                   <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-black text-brand-700">MU</div>
-                  <div><p className="font-bold text-slate-900">Md. Mohi Uddin</p><p className="text-xs text-slate-500">Malaysia desk · since May 2020</p></div>
+                  <div><p className="font-bold text-slate-900">Md. Tarek Bin Omor</p><p className="text-xs text-slate-500">Malaysia desk · since May 2020</p></div>
                 </div>
                 <div className="mt-5 divide-y divide-slate-100 text-sm">
-                  <a href="tel:+8801811667722" className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"><PhoneCall className="size-4 text-brand-600" />+880 1811 667722</a>
+                  <a href="tel:+0500000" className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"><PhoneCall className="size-4 text-brand-600" />+880 10000000</a>
                   <a href="mailto:info@visaboo.com" className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"><Mail className="size-4 text-brand-600" />info@visaboo.com</a>
-                  <p className="flex items-start gap-3 py-3 text-slate-600"><MapPin className="mt-0.5 size-4 shrink-0 text-brand-600" />Kabbokash Super Market, 4th Floor, Suite 14</p>
+                  <p className="flex items-start gap-3 py-3 text-slate-600"><MapPin className="mt-0.5 size-4 shrink-0 text-brand-600" />Paltan Super Market, 4th Floor, Suite 14</p>
                 </div>
                 <div className="mt-2 grid grid-cols-2 gap-3">
-                  <a href="https://wa.me/8801811667722" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-3 text-sm font-bold text-emerald-700"><MessageCircle className="size-4" />WhatsApp</a>
+                  <a href="https://wa.me/00000" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-3 text-sm font-bold text-emerald-700"><MessageCircle className="size-4" />WhatsApp</a>
                   <a href="mailto:info@visaboo.com" className="flex items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-sm font-bold text-white"><MessageCircle className="size-4" />Chat Now</a>
                 </div>
               </div>

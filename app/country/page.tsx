@@ -10,7 +10,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import TrackVisaModal from '../../components/TrackVisaModal';
 import AuthModal from '../../components/AuthModal';
-import { WORK_VISAS, WorkVisa } from '../../data/visa-data';
+import { WorkVisa } from '../../data/visa-data';
 import { fetchPublishedVisas } from '../../lib/supabase';
 
 export default function CountriesPage() {
@@ -18,7 +18,7 @@ export default function CountriesPage() {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; phone: string; role: string; avatar: string } | null>(null);
-  const [visas, setVisas] = useState<WorkVisa[]>(WORK_VISAS);
+  const [visas, setVisas] = useState<WorkVisa[]>([]);
 
   useEffect(() => {
     fetchPublishedVisas().then((apiVisas) => {

@@ -1,6 +1,6 @@
 // SERVER COMPONENT — resolves dynamic route and passes data to client component
 import { notFound } from 'next/navigation';
-import { WORK_VISAS } from '../../../../data/visa-data';
+import { connection } from 'next/server';
 import VisaDetailPage from './VisaDetailPage';
 import { fetchPublishedVisas } from '../../../../lib/supabase';
 
@@ -10,8 +10,9 @@ interface PageProps {
   params: Promise<{ country: string; slug: string }>;
 }
 
-export function generateStaticParams() {
-  return WORK_VISAS.map((v) => ({
+export async function generateStaticParams() {
+  const visas = await fetchPublishedVisas();
+  return visas.map((v) => ({
     country: v.countrySlug,
     slug: v.slug,
   }));
@@ -20,7 +21,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps) {
   const { country, slug } = await params;
   const apiVisas = await fetchPublishedVisas();
-  const visas = apiVisas.length ? apiVisas : WORK_VISAS;
+  const visas = apiVisas;
   const visa = visas.find(
     (v) => v.countrySlug === country && v.slug === slug
   );
@@ -32,9 +33,10 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function Page({ params }: PageProps) {
+  await connection();
   const { country, slug } = await params;
   const apiVisas = await fetchPublishedVisas();
-  const visas = apiVisas.length ? apiVisas : WORK_VISAS;
+  const visas = apiVisas;
 
   const visa = visas.find(
     (v) => v.countrySlug === country && v.slug === slug

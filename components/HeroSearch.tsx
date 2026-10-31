@@ -12,7 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import CountryFlag from "./CountryFlag";
-import { WORK_VISAS } from "../data/visa-data";
+import { WorkVisa } from "../data/visa-data";
 import { fetchPublishedVisas } from "../lib/supabase";
 
 const CITIZEN_COUNTRIES = [
@@ -62,7 +62,7 @@ export default function HeroSearch() {
   const router = useRouter();
   const [citizenCountry, setCitizenCountry] = useState("Bangladesh");
   const [destinationCountry, setDestinationCountry] = useState("Japan");
-  const [visas, setVisas] = useState(WORK_VISAS);
+  const [visas, setVisas] = useState<WorkVisa[]>([]);
 
   const [destMenuOpen, setDestMenuOpen] = useState(false);
   const [destSearchQuery, setDestSearchQuery] = useState("");
@@ -293,7 +293,7 @@ export default function HeroSearch() {
 
                       {filteredDestinations.length === 0 && (
                         <div className="py-4 text-center text-xs text-slate-500 font-medium">
-                          No countries matched "{destSearchQuery}".
+                          No countries matched &quot;{destSearchQuery}&quot;.
                         </div>
                       )}
                     </div>

@@ -27,7 +27,7 @@ export default function StoriesSection() {
         <div className="text-center max-w-2xl mx-auto">
           
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 font-display tracking-tight">
-            Stay <span className="text-amber-500">Updated</span> on the Stories
+            Stay <span className="text-amber-500">Updated</span> on the Blogs
           </h2>
           <p className="mt-3 text-sm sm:text-base text-slate-600 font-normal">
             Essential policy changes, embassy quota releases, and career guides written by our senior immigration caseworkers.
@@ -83,7 +83,7 @@ export default function StoriesSection() {
                     href={`/blog/${story.slug}`}
                     className="font-bold text-brand-700 hover:text-brand-800 flex items-center gap-1 shrink-0"
                   >
-                    Read Story <ArrowRight className="size-3" />
+                    Read Blog <ArrowRight className="size-3" />
                   </Link>
                 </div>
               </div>
@@ -97,7 +97,7 @@ export default function StoriesSection() {
             href="/blog"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-200 hover:border-brand-600 hover:text-brand-700 text-slate-700 font-bold text-xs sm:text-sm transition-all shadow-sm"
           >
-            <span>View All Stories & Articles</span>
+            <span>View All Blogs</span>
             <ArrowRight className="size-4" />
           </Link>
         </div>

@@ -8,7 +8,7 @@ import {
   Globe2,
   ArrowRight,
 } from 'lucide-react';
-import { WORK_VISAS, REGIONS, WorkVisa } from '../data/visa-data';
+import { REGIONS, WorkVisa } from '../data/visa-data';
 import { fetchPublishedVisas } from '../lib/supabase';
 
 interface ExploreWorkVisaProps {
@@ -19,7 +19,7 @@ interface ExploreWorkVisaProps {
 
 export default function ExploreWorkVisa({ selectedFilterCountry }: ExploreWorkVisaProps) {
   const [activeRegion, setActiveRegion] = useState<string>('All');
-  const [visas, setVisas] = useState<WorkVisa[]>(WORK_VISAS);
+  const [visas, setVisas] = useState<WorkVisa[]>([]);
 
   useEffect(() => {
     fetchPublishedVisas().then((apiVisas) => {

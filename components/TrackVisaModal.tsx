@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, X, AlertCircle } from 'lucide-react';
-import { MOCK_APPLICATIONS } from '../data/mock-tracking';
+import { fetchTrackedSubmission, getStoredAccessToken } from '../lib/supabase';
 
 interface TrackVisaModalProps {
   isOpen: boolean;
@@ -13,22 +13,47 @@ interface TrackVisaModalProps {
 export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: TrackVisaModalProps) {
   const [trackingInput, setTrackingInput] = useState(initialTrackingId || 'VBD-2026-89412');
   const [errorMessage, setErrorMessage] = useState('');
+  const [application, setApplication] = useState<Record<string, unknown> | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setApplication(null);
+    if (!getStoredAccessToken()) {
+      setErrorMessage('Please log in before tracking an application.');
+    } else {
+      setErrorMessage('');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSearch = (e?: React.FormEvent) => {
+  const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanId = trackingInput.trim().toUpperCase();
-    if (MOCK_APPLICATIONS[cleanId]) {
-      setErrorMessage('');
-    } else {
-      setErrorMessage(`No active application found for ID "${cleanId}". Try demo ID "VBD-2026-89412" or "VBD-2026-33901".`);
+    if (!getStoredAccessToken()) {
+      setApplication(null);
+      setErrorMessage('Please log in before tracking an application.');
+      return;
     }
-  };
-
-  const loadDemo = (id: string) => {
-    setTrackingInput(id);
+    setIsSearching(true);
     setErrorMessage('');
+    try {
+      const backendApplication = await fetchTrackedSubmission(cleanId);
+      if (backendApplication) {
+        setApplication(backendApplication);
+        setIsSearching(false);
+        return;
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to track this application.');
+      setApplication(null);
+      setIsSearching(false);
+      return;
+    }
+    setErrorMessage(`No active application found for ID "${cleanId}".`);
+    setApplication(null);
+    setIsSearching(false);
   };
 
   return (
@@ -71,41 +96,22 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
               type="submit"
               className="justify-center px-5 py-2.5 bg-brand-700 hover:bg-brand-800 text-white font-medium rounded-xl text-sm transition-all shadow-sm flex items-center gap-1.5"
             >
-              Track Now
+              {isSearching ? 'Searching...' : 'Track Now'}
             </button>
           </form>
-
-          {/* Quick Demo Buttons */}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-500 font-medium">Quick Demo Samples:</span>
-            <button
-              type="button"
-              onClick={() => loadDemo('VBD-2026-89412')}
-              className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors border ${
-                trackingInput === 'VBD-2026-89412'
-                  ? 'bg-brand-600 text-white border-brand-600'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              🇯🇵 Japan SSW-1 (In Progress)
-            </button>
-            <button
-              type="button"
-              onClick={() => loadDemo('VBD-2026-33901')}
-              className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors border ${
-                trackingInput === 'VBD-2026-33901'
-                  ? 'bg-brand-600 text-white border-brand-600'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              🇩🇪 Germany Chancenkarte (Approved)
-            </button>
-          </div>
 
           {errorMessage && (
             <div className="mt-3 p-3 text-xs bg-rose-50 text-rose-700 border border-rose-200 rounded-xl flex items-center gap-2">
               <AlertCircle className="size-4 shrink-0" />
               <span>{errorMessage}</span>
+            </div>
+          )}
+          {application && (
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
+              <p className="font-bold text-slate-900">Application found</p>
+              <p className="mt-1 text-slate-600">Status: {String(application.status ?? 'Under Review')}</p>
+              <p className="text-slate-600">Visa: {String(application.visa_title ?? application.visa ?? '')}</p>
+              <p className="text-slate-600">Country: {String(application.country ?? '')}</p>
             </div>
           )}
         </div>

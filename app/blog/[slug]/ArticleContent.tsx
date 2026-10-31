@@ -73,7 +73,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
               href="/blog"
               className="hover:text-brand-700 transition-colors"
             >
-              Articles &amp; Stories
+              Blogs
             </Link>
             <span>/</span>
             <span className="text-slate-800 truncate max-w-xs">
@@ -189,7 +189,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
             </div>
           </div>
 
-          {/* Related Articles */}
+          {/* Related Blogs */}
           {relatedStories.length > 0 && (
             <section
               aria-labelledby="related-heading"
@@ -200,7 +200,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
                   id="related-heading"
                   className="text-xl font-bold font-display text-slate-950"
                 >
-                  Related Articles
+                  Related Blogs
                 </h2>
                 <Link
                   href="/blog"

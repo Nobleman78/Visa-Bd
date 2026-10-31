@@ -81,7 +81,7 @@ export default function BlogListingPage() {
           <div className="text-center max-w-3xl mx-auto mb-12">
             <h1 className="text-4xl sm:text-5xl font-black text-slate-950 font-display tracking-tight leading-tight">
               Stay Updated on{" "}
-              <span className="text-amber-500">Immigration Stories</span>
+              <span className="text-amber-500">Immigration Blogs</span>
             </h1>
             <p className="mt-4 text-base text-slate-600 leading-relaxed font-normal">
               Direct intelligence from our licensed solicitors on foreign
@@ -96,7 +96,7 @@ export default function BlogListingPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search articles by country, visa type or policy..."
+                placeholder="Search blogs by country, visa type or policy..."
                 className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"
               />
             </div>
@@ -185,7 +185,7 @@ export default function BlogListingPage() {
             </div>
           )}
 
-          {/* Grid of All Articles */}
+          {/* Grid of All Blogs */}
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredStories.map((story) => (
               <article
@@ -243,7 +243,7 @@ export default function BlogListingPage() {
             <div className="text-center py-16 bg-white rounded-3xl border border-slate-200">
               <BookOpen className="size-10 text-slate-300 mx-auto mb-3" />
               <h3 className="text-base font-bold text-slate-900">
-                No articles matched your filter
+                No blogs matched your filter
               </h3>
               <p className="text-xs text-slate-500 mt-1">
                 Try clearing your search term or choosing a different category.

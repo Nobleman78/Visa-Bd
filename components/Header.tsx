@@ -16,7 +16,7 @@ import {
   Sparkles,
   Compass,
 } from "lucide-react";
-import { POPULAR_COUNTRIES_BY_REGION, WORK_VISAS } from "../data/visa-data";
+import { POPULAR_COUNTRIES_BY_REGION, WorkVisa } from "../data/visa-data";
 import CountryFlag from "./CountryFlag";
 import Image from "next/image";
 import { fetchPublishedVisas } from "../lib/supabase";
@@ -46,7 +46,7 @@ export default function Header({
   >("Asia");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [visas, setVisas] = useState(WORK_VISAS);
+  const [visas, setVisas] = useState<WorkVisa[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -273,12 +273,12 @@ export default function Header({
             Why Choose Us
           </button>
 
-          {/* Stories & Articles — real page */}
+          {/* Blogs — real page */}
           <Link
             href="/blog"
             className={navLinkClass(pathname.startsWith("/blog"))}
           >
-            Stories &amp; Articles
+            Blogs
           </Link>
         </nav>
 
@@ -434,7 +434,7 @@ export default function Header({
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center py-3 px-3 rounded-xl text-sm font-semibold text-slate-800 hover:bg-brand-50 hover:text-brand-700 transition-colors"
           >
-            Stories &amp; Articles
+            Blogs
           </Link>
 
           <div className="pt-3 border-t border-slate-100 mt-2 flex gap-2">
