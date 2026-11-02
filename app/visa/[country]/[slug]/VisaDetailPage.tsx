@@ -1,10 +1,10 @@
 "use client";
 
-import Image from 'next/image';
+import Image from "next/image";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Clock,
@@ -26,15 +26,19 @@ import {
   BedDouble,
   Repeat2,
   Timer,
-} from 'lucide-react';
-import { WorkVisa } from '../../../../data/visa-data';
-import Header from '../../../../components/Header';
-import Footer from '../../../../components/Footer';
-import TrackVisaModal from '../../../../components/TrackVisaModal';
-import AuthModal from '../../../../components/AuthModal';
-import CountryFlag from '../../../../components/CountryFlag';
-import { fetchPublishedVisas } from '../../../../lib/supabase';
-import { createSubmission, getStoredAccessToken, uploadSubmissionDocuments } from '../../../../lib/supabase';
+} from "lucide-react";
+import { WorkVisa } from "../../../../data/visa-data";
+import Header from "../../../../components/Header";
+import Footer from "../../../../components/Footer";
+import TrackVisaModal from "../../../../components/TrackVisaModal";
+import AuthModal from "../../../../components/AuthModal";
+import CountryFlag from "../../../../components/CountryFlag";
+import { fetchPublishedVisas } from "../../../../lib/supabase";
+import {
+  createSubmission,
+  getStoredAccessToken,
+  uploadSubmissionDocuments,
+} from "../../../../lib/supabase";
 
 interface Props {
   visa: WorkVisa;
@@ -44,8 +48,8 @@ interface Props {
 export default function VisaDetailPage({ visa, relatedVisas }: Props) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'requirements' | 'stages' | 'apply'
-  >('overview');
+    "overview" | "requirements" | "stages" | "apply"
+  >("overview");
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{
@@ -58,18 +62,20 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
 
   // Application form
   const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    nid: '',
-    dateOfBirth: '',
-    education: 'Bachelor Degree',
-    experienceYears: '3',
+    name: "",
+    phone: "",
+    email: "",
+    nid: "",
+    dateOfBirth: "",
+    education: "Bachelor Degree",
+    experienceYears: "3",
     hasPassport: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successId, setSuccessId] = useState('');
-  const [selectedDocuments, setSelectedDocuments] = useState<Record<string, { file: File; previewUrl: string | null }>>({});
+  const [successId, setSuccessId] = useState("");
+  const [selectedDocuments, setSelectedDocuments] = useState<
+    Record<string, { file: File; previewUrl: string | null }>
+  >({});
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,15 +85,24 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
     }
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const randomPart = crypto.getRandomValues(new Uint32Array(1))[0] % 90000 + 10000;
+    const randomPart =
+      (crypto.getRandomValues(new Uint32Array(1))[0] % 90000) + 10000;
     const trackId = `VBD-2026-${randomPart}`;
-    let documents: Record<string, { path: string; name: string; type: string }> = {};
+    let documents: Record<
+      string,
+      { path: string; name: string; type: string }
+    > = {};
     try {
       documents = await uploadSubmissionDocuments(formData, trackId);
       const expectedDocumentCount = Object.keys(documents).length;
-      if (expectedDocumentCount === 0) throw new Error('No documents were uploaded.');
+      if (expectedDocumentCount === 0)
+        throw new Error("No documents were uploaded.");
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : 'Documents could not be uploaded.');
+      window.alert(
+        error instanceof Error
+          ? error.message
+          : "Documents could not be uploaded.",
+      );
       setIsSubmitting(false);
       return;
     }
@@ -105,23 +120,33 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
       visa_slug: visa.slug,
       visa_title: visa.visaTitle,
       documents,
-      status: 'Under Review',
-    }).then(() => {
-      setSuccessId(trackId);
-      setIsSubmitting(false);
-      setActiveTab('overview');
-    }).catch((error) => {
-      console.error(error);
-      setIsSubmitting(false);
-      window.alert(error instanceof Error ? error.message : 'Application could not be submitted.');
-    });
+      status: "Under Review",
+    })
+      .then(() => {
+        setSuccessId(trackId);
+        setIsSubmitting(false);
+        setActiveTab("overview");
+      })
+      .catch((error) => {
+        console.error(error);
+        setIsSubmitting(false);
+        window.alert(
+          error instanceof Error
+            ? error.message
+            : "Application could not be submitted.",
+        );
+      });
   };
 
-  const tabs: { key: 'overview' | 'requirements' | 'stages' | 'apply'; label: string; accent?: boolean }[] = [
-    { key: 'overview', label: 'Overview & Benefits' },
-    { key: 'requirements', label: 'Eligibility & Checklist' },
-    { key: 'stages', label: 'Embassy Stages & Fees' },
-    { key: 'apply', label: 'Required Documents', accent: true },
+  const tabs: {
+    key: "overview" | "requirements" | "stages" | "apply";
+    label: string;
+    accent?: boolean;
+  }[] = [
+    { key: "overview", label: "Overview & Benefits" },
+    { key: "requirements", label: "Eligibility & Checklist" },
+    { key: "stages", label: "Embassy Stages & Fees" },
+    { key: "apply", label: "Required Documents", accent: true },
   ];
 
   return (
@@ -133,7 +158,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
           // navigate to the correct visa page from header dropdown
           const visas = await fetchPublishedVisas();
           const match = visas.find(
-            (v: WorkVisa) => v.country.toLowerCase() === name.toLowerCase()
+            (v: WorkVisa) => v.country.toLowerCase() === name.toLowerCase(),
           );
           if (match) router.push(`/visa/${match.countrySlug}/${match.slug}`);
         }}
@@ -148,7 +173,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
             src={visa.image}
             alt={visa.country}
             className="w-full h-full object-cover opacity-50"
-           width={1200} height={800} />
+            width={1200}
+            height={800}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
 
           {/* Breadcrumb */}
@@ -157,11 +184,17 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
               aria-label="Breadcrumb"
               className="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-white/60"
             >
-              <Link href="/" className="hover:text-white transition-colors flex items-center gap-1">
+              <Link
+                href="/"
+                className="hover:text-white transition-colors flex items-center gap-1"
+              >
                 <ArrowLeft className="size-3" /> Home
               </Link>
               <ChevronRight className="size-3" />
-              <Link href="/#explore-visas" className="hover:text-white transition-colors">
+              <Link
+                href="/#explore-visas"
+                className="hover:text-white transition-colors"
+              >
                 Work Visas
               </Link>
               <ChevronRight className="size-3" />
@@ -172,7 +205,11 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
           {/* Title block */}
           <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <CountryFlag code={visa.countryCode} name={visa.country} size="size-7" />
+              <CountryFlag
+                code={visa.countryCode}
+                name={visa.country}
+                size="size-7"
+              />
               <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-black/50 backdrop-blur px-2.5 py-0.5 rounded-full border border-amber-400/30">
                 {visa.region} · {visa.country}
               </span>
@@ -203,7 +240,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   <dt className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                     Processing
                   </dt>
-                  <dd className="text-sm font-bold text-slate-900">{visa.processingTime}</dd>
+                  <dd className="text-sm font-bold text-slate-900">
+                    {visa.processingTime}
+                  </dd>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -214,7 +253,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   <dt className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                     Validity
                   </dt>
-                  <dd className="text-sm font-bold text-slate-900">{visa.validity}</dd>
+                  <dd className="text-sm font-bold text-slate-900">
+                    {visa.validity}
+                  </dd>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -225,7 +266,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   <dt className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
                     Min. Education
                   </dt>
-                  <dd className="text-sm font-bold text-slate-900">{visa.minEducation}</dd>
+                  <dd className="text-sm font-bold text-slate-900">
+                    {visa.minEducation}
+                  </dd>
                 </div>
               </div>
             </dl>
@@ -246,7 +289,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                       Application Submitted Successfully!
                     </p>
                     <p className="text-xs text-emerald-700 mt-0.5">
-                      Your tracking ID:{' '}
+                      Your tracking ID:{" "}
                       <span className="font-mono font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">
                         {successId}
                       </span>
@@ -271,9 +314,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     className={`snap-start shrink-0 py-3.5 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
                       activeTab === tab.key
                         ? tab.accent
-                          ? 'border-amber-500 text-amber-600 bg-amber-50'
-                          : 'border-brand-600 text-brand-700'
-                        : `border-transparent ${tab.accent ? 'text-amber-600 hover:text-amber-700' : 'text-slate-600 hover:text-slate-900'}`
+                          ? "border-amber-500 text-amber-600 bg-amber-50"
+                          : "border-brand-600 text-brand-700"
+                        : `border-transparent ${tab.accent ? "text-amber-600 hover:text-amber-700" : "text-slate-600 hover:text-slate-900"}`
                     }`}
                   >
                     {tab.label}
@@ -283,7 +326,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
 
               <div className="min-w-0 overflow-hidden bg-white rounded-b-2xl border border-t-0 border-slate-200 p-3 sm:p-6 space-y-6">
                 {/* TAB: OVERVIEW */}
-                {activeTab === 'overview' && (
+                {activeTab === "overview" && (
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-lg font-bold text-slate-900 font-display mb-2">
@@ -331,7 +374,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 )}
 
                 {/* TAB: REQUIREMENTS */}
-                {activeTab === 'requirements' && (
+                {activeTab === "requirements" && (
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-base font-bold text-slate-900 font-display mb-3 flex items-center gap-2">
@@ -347,7 +390,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                             <span className="size-5 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
                               {i + 1}
                             </span>
-                            <span className="leading-relaxed font-medium">{item}</span>
+                            <span className="leading-relaxed font-medium">
+                              {item}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -373,7 +418,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 )}
 
                 {/* TAB: STAGES */}
-                {activeTab === 'stages' && (
+                {activeTab === "stages" && (
                   <div className="space-y-6">
                     <div className="p-5 rounded-2xl bg-gradient-to-r from-brand-900 to-slate-900 text-white flex flex-wrap items-center justify-between gap-4">
                       <div>
@@ -386,12 +431,20 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                       </div>
                       <div className="flex w-full items-center justify-between gap-4 text-left sm:w-auto sm:text-right">
                         <div>
-                          <p className="text-xs text-slate-400">Embassy Stamping Fee</p>
-                          <p className="text-sm font-bold text-white">{visa.govtFee}</p>
+                          <p className="text-xs text-slate-400">
+                            Embassy Stamping Fee
+                          </p>
+                          <p className="text-sm font-bold text-white">
+                            {visa.govtFee}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-400">Legal Consultation</p>
-                          <p className="text-base font-bold text-amber-400">{visa.serviceFee}</p>
+                          <p className="text-xs text-slate-400">
+                            Legal Consultation
+                          </p>
+                          <p className="text-base font-bold text-amber-400">
+                            {visa.serviceFee}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -406,7 +459,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                             className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200"
                           >
                             <div className="size-9 rounded-full bg-brand-700 text-white font-bold text-xs flex items-center justify-center shrink-0">
-                              {String(i + 1).padStart(2, '0')}
+                              {String(i + 1).padStart(2, "0")}
                             </div>
                             <p className="text-xs sm:text-sm text-slate-800 font-medium">
                               {stage}
@@ -419,10 +472,12 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 )}
 
                 {/* TAB: APPLY */}
-                {activeTab === 'apply' && (
+                {activeTab === "apply" && (
                   <form onSubmit={handleApply} className="space-y-5">
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 leading-relaxed">
-                      <strong>Fast-Track Application:</strong> Submit your details to receive a real tracking ID and trigger our agency verification pipeline.
+                      <strong>Fast-Track Application:</strong> Submit your
+                      details to receive a real tracking ID and trigger our
+                      agency verification pipeline.
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-4">
@@ -435,7 +490,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           required
                           placeholder="Tariqul Islam"
                           value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, name: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         />
                       </div>
@@ -448,7 +505,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           required
                           placeholder="+8801712345678"
                           value={form.phone}
-                          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, phone: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         />
                       </div>
@@ -464,7 +523,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           required
                           placeholder="name@example.com"
                           value={form.email}
-                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, email: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         />
                       </div>
@@ -477,7 +538,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           required
                           placeholder="National ID number"
                           value={form.nid}
-                          onChange={(e) => setForm({ ...form, nid: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, nid: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         />
                       </div>
@@ -489,7 +552,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                           type="date"
                           required
                           value={form.dateOfBirth}
-                          onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, dateOfBirth: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         />
                       </div>
@@ -502,7 +567,9 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                         </label>
                         <select
                           value={form.education}
-                          onChange={(e) => setForm({ ...form, education: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, education: e.target.value })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         >
                           <option>HSC / High School</option>
@@ -517,7 +584,12 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                         </label>
                         <select
                           value={form.experienceYears}
-                          onChange={(e) => setForm({ ...form, experienceYears: e.target.value })}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              experienceYears: e.target.value,
+                            })
+                          }
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                         >
                           <option value="0">Fresh Candidate (0 years)</option>
@@ -529,20 +601,33 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     </div>
 
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 mb-3">Required Documents</h3>
+                      <h3 className="text-sm font-bold text-slate-900 mb-3">
+                        Required Documents
+                      </h3>
                       <div className="grid sm:grid-cols-2 gap-4">
                         {[
-                          ['Passport photo', 'passport-photo'],
-                          ['Passport copy', 'passport-copy'],
-                          ['NID front and back', 'nid-copy'],
-                          ['Updated CV / Resume', 'resume'],
-                          ['Educational certificates', 'education-certificates'],
-                          ['Experience certificates', 'experience-certificates'],
-                          ['Police clearance certificate', 'police-clearance'],
-                          ['Medical report', 'medical-report'],
+                          ["Passport photo", "passport-photo"],
+                          ["Passport copy", "passport-copy"],
+                          ["NID front and back", "nid-copy"],
+                          ["Updated CV / Resume", "resume"],
+                          [
+                            "Educational certificates",
+                            "education-certificates",
+                          ],
+                          [
+                            "Experience certificates",
+                            "experience-certificates",
+                          ],
+                          ["Police clearance certificate", "police-clearance"],
+                          ["Medical report", "medical-report"],
                         ].map(([label, name]) => (
-                          <label key={name} className="block p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-                            <span className="block text-xs font-bold text-slate-700 mb-2">{label} *</span>
+                          <label
+                            key={name}
+                            className="block p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors"
+                          >
+                            <span className="block text-xs font-bold text-slate-700 mb-2">
+                              {label} *
+                            </span>
                             <input
                               type="file"
                               name={name}
@@ -552,28 +637,39 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                                 const file = event.target.files?.[0];
                                 if (!file) return;
                                 setSelectedDocuments((current) => {
-                                  if (current[name]?.previewUrl) URL.revokeObjectURL(current[name].previewUrl);
+                                  if (current[name]?.previewUrl)
+                                    URL.revokeObjectURL(
+                                      current[name].previewUrl,
+                                    );
                                   return {
                                     ...current,
                                     [name]: {
                                       file,
-                                      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+                                      previewUrl: file.type.startsWith("image/")
+                                        ? URL.createObjectURL(file)
+                                        : null,
                                     },
                                   };
                                 });
                               }}
                               className="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-bold file:text-brand-700 hover:file:bg-brand-100"
                             />
-                            <span className="mt-1.5 block text-[10px] text-slate-400">JPG, PNG or PDF</span>
+                            <span className="mt-1.5 block text-[10px] text-slate-400">
+                              JPG, PNG or PDF
+                            </span>
                             {selectedDocuments[name]?.previewUrl && (
-                              <img
+                              <Image
+                                height={1000}
+                                width={1000}
                                 src={selectedDocuments[name].previewUrl!}
                                 alt={`Preview of ${selectedDocuments[name].file.name}`}
                                 className="mt-3 max-h-40 w-full rounded-lg border border-slate-200 bg-white object-contain"
                               />
                             )}
                             {selectedDocuments[name] && (
-                              <span className="mt-2 block truncate text-[10px] font-semibold text-slate-600">{selectedDocuments[name].file.name}</span>
+                              <span className="mt-2 block truncate text-[10px] font-semibold text-slate-600">
+                                {selectedDocuments[name].file.name}
+                              </span>
                             )}
                           </label>
                         ))}
@@ -585,11 +681,14 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                         type="checkbox"
                         id="hasPassport"
                         checked={form.hasPassport}
-                        onChange={(e) => setForm({ ...form, hasPassport: e.target.checked })}
+                        onChange={(e) =>
+                          setForm({ ...form, hasPassport: e.target.checked })
+                        }
                         className="rounded text-brand-600 focus:ring-brand-500 size-4 shrink-0"
                       />
                       <span className="text-xs text-slate-700 font-medium">
-                        I hold a valid passport with at least 12 months remaining validity.
+                        I hold a valid passport with at least 12 months
+                        remaining validity.
                       </span>
                     </label>
 
@@ -602,7 +701,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                         <span>Generating Official File & Tracking ID...</span>
                       ) : (
                         <>
-                          <span>Submit Application for {visa.country} — {visa.visaTitle}</span>
+                          <span>
+                            Submit Application for {visa.country} —{" "}
+                            {visa.visaTitle}
+                          </span>
                           <ArrowRight className="size-4" />
                         </>
                       )}
@@ -612,7 +714,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
               </div>
 
               {/* CTA bar */}
-              {activeTab !== 'apply' && (
+              {activeTab !== "apply" && (
                 <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Shield className="size-4 text-emerald-600 shrink-0" />
@@ -620,7 +722,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('apply')}
+                    onClick={() => setActiveTab("apply")}
                     className="w-full sm:w-auto justify-center px-5 py-2.5 bg-brand-700 hover:bg-brand-800 text-white font-semibold rounded-xl text-xs transition-colors flex items-center gap-1.5 shrink-0"
                   >
                     Apply for this Work Visa <ArrowRight className="size-3.5" />
@@ -632,26 +734,96 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
             {/* RIGHT: Sidebar */}
             <aside className="min-w-0 space-y-5">
               {/* Call-to-action card */}
-             
 
               {/* Visa details card */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5">
                 <div className="flex items-center justify-between gap-3">
-                  <h4 className="text-lg font-bold text-slate-900 font-display">Visa Details</h4>
-                  <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">{visa.badge || 'Visa'}</span>
+                  <h4 className="text-lg font-bold text-slate-900 font-display">
+                    Visa Details
+                  </h4>
+                  <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-bold text-brand-700">
+                    {visa.badge || "Visa"}
+                  </span>
                 </div>
                 <div className="space-y-3 text-sm">
-                  <div className="flex min-w-0 items-start justify-between gap-4"><span className="flex shrink-0 items-center gap-2 text-slate-500"><BadgeCheck className="size-4 text-brand-500" />Visa type</span><span className="min-w-0 break-words font-semibold text-slate-900 text-right">{visa.categoryTag}</span></div>
-                  <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><CalendarDays className="size-4 text-brand-500" />Validity</span><span className="font-semibold text-slate-900">{visa.validity}</span></div>
-                  {visa.country === 'Malaysia' && <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><BedDouble className="size-4 text-brand-500" />Stay period</span><span className="font-semibold text-slate-900">30 Days</span></div>}
-                  <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><Repeat2 className="size-4 text-brand-500" />Entry type</span><span className="font-semibold text-slate-900">{visa.country === 'Malaysia' ? 'Single Entry' : 'As stated'}</span></div>
-                  <div className="flex items-center justify-between gap-4"><span className="flex items-center gap-2 text-slate-500"><Timer className="size-4 text-brand-500" />Processing</span><span className="font-semibold text-slate-900 text-right">{visa.processingTime}</span></div>
+                  <div className="flex min-w-0 items-start justify-between gap-4">
+                    <span className="flex shrink-0 items-center gap-2 text-slate-500">
+                      <BadgeCheck className="size-4 text-brand-500" />
+                      Visa type
+                    </span>
+                    <span className="min-w-0 break-words font-semibold text-slate-900 text-right">
+                      {visa.categoryTag}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-2 text-slate-500">
+                      <CalendarDays className="size-4 text-brand-500" />
+                      Validity
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {visa.validity}
+                    </span>
+                  </div>
+                  {visa.country === "Malaysia" && (
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="flex items-center gap-2 text-slate-500">
+                        <BedDouble className="size-4 text-brand-500" />
+                        Stay period
+                      </span>
+                      <span className="font-semibold text-slate-900">
+                        30 Days
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-2 text-slate-500">
+                      <Repeat2 className="size-4 text-brand-500" />
+                      Entry type
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {visa.country === "Malaysia"
+                        ? "Single Entry"
+                        : "As stated"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-2 text-slate-500">
+                      <Timer className="size-4 text-brand-500" />
+                      Processing
+                    </span>
+                    <span className="font-semibold text-slate-900 text-right">
+                      {visa.processingTime}
+                    </span>
+                  </div>
                 </div>
                 <div className="border-t border-dashed border-slate-200 pt-4">
-                  <div className="flex items-center justify-between py-2 text-sm"><span className="text-slate-500">Visa Fee × 1</span><span className="font-semibold text-slate-800">{visa.country === 'Malaysia' ? '৳ 4,250' : visa.govtFee}</span></div>
-                  <div className="flex items-center justify-between py-2 text-sm"><span className="text-slate-500">Service Fee × 1</span><span className="font-semibold text-slate-800">{visa.country === 'Malaysia' ? '৳ 598' : visa.serviceFee}</span></div>
-                  <div className="mt-3 flex items-end justify-between border-t border-dashed border-slate-200 pt-4"><span className="font-bold text-slate-900">Total Payable</span><span className="text-2xl font-black text-brand-700">{visa.country === 'Malaysia' ? '৳ 4,848' : visa.serviceFee}</span></div>
-                  <button type="button" onClick={() => setActiveTab('apply')} className="mt-4 flex w-full items-center justify-center rounded-xl bg-amber-500 py-3 text-sm font-bold text-slate-950 hover:bg-amber-600">
+                  <div className="flex items-center justify-between py-2 text-sm">
+                    <span className="text-slate-500">Visa Fee × 1</span>
+                    <span className="font-semibold text-slate-800">
+                      {visa.country === "Malaysia" ? "৳ 4,250" : visa.govtFee}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 text-sm">
+                    <span className="text-slate-500">Service Fee × 1</span>
+                    <span className="font-semibold text-slate-800">
+                      {visa.country === "Malaysia" ? "৳ 598" : visa.serviceFee}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-end justify-between border-t border-dashed border-slate-200 pt-4">
+                    <span className="font-bold text-slate-900">
+                      Total Payable
+                    </span>
+                    <span className="text-2xl font-black text-brand-700">
+                      {visa.country === "Malaysia"
+                        ? "৳ 4,848"
+                        : visa.serviceFee}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("apply")}
+                    className="mt-4 flex w-full items-center justify-center rounded-xl bg-amber-500 py-3 text-sm font-bold text-slate-950 hover:bg-amber-600"
+                  >
                     Submit Documents <ArrowRight className="ml-2 size-4" />
                   </button>
                 </div>
@@ -659,19 +831,67 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
 
               {/* Visa consultant */}
               <div className="bg-white rounded-2xl border border-slate-200 p-5">
-                <h4 className="text-lg font-bold text-slate-900 font-display">Your Visa Consultant</h4>
+                <h4 className="text-lg font-bold text-slate-900 font-display">
+                  Your Visa Consultant
+                </h4>
                 <div className="mt-5 flex items-center gap-4">
-                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-black text-brand-700">MU</div>
-                  <div><p className="font-bold text-slate-900">Md. Tarek Bin Omor</p><p className="text-xs text-slate-500">Malaysia desk · since May 2020</p></div>
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-black text-brand-700">
+                    MU
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">
+                      Md. Tarek Bin Omor
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Malaysia desk · since May 2020
+                    </p>
+                  </div>
                 </div>
                 <div className="mt-5 divide-y divide-slate-100 text-sm">
-                  <a href="tel:+0500000" className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"><PhoneCall className="size-4 text-brand-600" />+880 10000000</a>
-                  <a href="mailto:info@visaboo.com" className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"><Mail className="size-4 text-brand-600" />info@visaboo.com</a>
-                  <p className="flex items-start gap-3 py-3 text-slate-600"><MapPin className="mt-0.5 size-4 shrink-0 text-brand-600" />Paltan Super Market, 4th Floor, Suite 14</p>
+                  <a
+                    href="tel:+8801711752231"
+                    className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"
+                  >
+                    <PhoneCall className="size-4 text-brand-600" />
+                    +8801711-752231 (WhatsApp)
+                  </a>
+                  <a
+                    href="tel:+8801703994399"
+                    className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"
+                  >
+                    <PhoneCall className="size-4 text-brand-600" />
+                    +8801703-994399
+                  </a>
+                  <a
+                    href="mailto:support@visabd.com"
+                    className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"
+                  >
+                    <Mail className="size-4 text-brand-600" />
+                    support@visabd.com
+                  </a>
+                  <p className="flex items-start gap-3 py-3 text-slate-600">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-brand-600" />
+                    55/A, HM SIDDIQUE MANSION (Level-3), PURANA PALTAN,
+                    DHAKA-1000, BANGLADESH
+                  </p>
                 </div>
                 <div className="mt-2 grid grid-cols-2 gap-3">
-                  <a href="https://wa.me/00000" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-3 text-sm font-bold text-emerald-700"><MessageCircle className="size-4" />WhatsApp</a>
-                  <a href="mailto:info@visaboo.com" className="flex items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-sm font-bold text-white"><MessageCircle className="size-4" />Chat Now</a>
+                  <a
+                    href="https://wa.me/8801711752231"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-3 text-sm font-bold text-emerald-700"
+                  >
+                    <MessageCircle className="size-4" />
+                    WhatsApp
+                  </a>
+                  <a
+                    href="mailto:support@visabd.com"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-sm font-bold text-white"
+                  >
+                    <MessageCircle className="size-4" />
+                    Chat Now
+                  </a>
                 </div>
               </div>
 
@@ -689,12 +909,18 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                         href={`/visa/${r.countrySlug}/${r.slug}`}
                         className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-brand-50 group transition-colors"
                       >
-                        <CountryFlag code={r.countryCode} name={r.country} size="size-6" />
+                        <CountryFlag
+                          code={r.countryCode}
+                          name={r.country}
+                          size="size-6"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
                             {r.country}
                           </p>
-                          <p className="text-[11px] text-slate-500 truncate">{r.visaTitle}</p>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {r.visaTitle}
+                          </p>
                         </div>
                         <ArrowRight className="size-3.5 text-slate-300 group-hover:text-brand-600 transition-colors shrink-0" />
                       </Link>
