@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Search, X, AlertCircle } from 'lucide-react';
 import { fetchTrackedSubmission, getStoredAccessToken } from '../lib/supabase';
 
@@ -12,19 +12,20 @@ interface TrackVisaModalProps {
 
 export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: TrackVisaModalProps) {
   const [trackingInput, setTrackingInput] = useState(initialTrackingId || 'VBD-2026-89412');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(() =>
+    typeof window !== 'undefined' && !getStoredAccessToken()
+      ? 'Please log in before tracking an application.'
+      : '',
+  );
   const [application, setApplication] = useState<Record<string, unknown> | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    if (!isOpen) return;
+  const handleClose = () => {
     setApplication(null);
-    if (!getStoredAccessToken()) {
-      setErrorMessage('Please log in before tracking an application.');
-    } else {
-      setErrorMessage('');
-    }
-  }, [isOpen]);
+    setErrorMessage('');
+    setIsSearching(false);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -57,7 +58,7 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-2 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
       <div role="dialog" aria-modal="true" aria-label="Live Work Visa Application Tracker" className="relative w-full max-w-2xl max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 flex flex-col">
         {/* Modal Header */}
         <div className="sticky top-0 z-10 flex shrink-0 items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 sm:py-5 bg-white border-b border-slate-100">
@@ -71,7 +72,7 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="shrink-0 p-2 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors"
             aria-label="Close tracker"
           >
@@ -118,9 +119,9 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
 
         {/* Modal Footer */}
         <div className="sticky bottom-0 shrink-0 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-auto">
-          <p className="text-xs text-slate-500 text-center sm:text-left">Need urgent inquiry? Call our Dhaka hotline: <strong>+880 9612-884422</strong></p>
+          <p className="text-xs text-slate-500 text-center sm:text-left">Need urgent inquiry? Call: <strong>+8801711-752231</strong></p>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium rounded-xl text-xs transition-colors"
           >
             Close

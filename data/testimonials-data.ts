@@ -21,7 +21,7 @@ export const TESTIMONIALS: Testimonial[] = [
     flag: '🇯🇵',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
     rating: 5,
-    comment: 'VisaBD handled my entire Japanese SSW file from Prometric skill test registration to COE release in Tokyo. Their case officer guided me step by step with zero hidden costs.',
+    comment: 'WorkVisaBd handled my entire Japanese SSW file from Prometric skill test registration to COE release in Tokyo. Their case officer guided me step by step with zero hidden costs.',
     date: '15 Oct 2026'
   },
   {
@@ -33,7 +33,7 @@ export const TESTIMONIALS: Testimonial[] = [
     flag: '🇩🇪',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
     rating: 5,
-    comment: 'I was overwhelmed by German points assessment and blocked account paperwork. VisaBD prepared my dossier so cleanly that my visa was stamped within 3 weeks of my embassy interview.',
+    comment: 'I was overwhelmed by German points assessment and blocked account paperwork. WorkVisaBd prepared my dossier so cleanly that my visa was stamped within 3 weeks of my embassy interview.',
     date: '02 Oct 2026'
   },
   {

@@ -25,7 +25,7 @@ interface HeaderProps {
   onOpenTrackModal: () => void;
   onOpenAuthModal: () => void;
   onSelectCountryVisa: (countryName: string) => void;
-  user: { name: string; phone: string; role: string; avatar: string } | null;
+  user: { name: string; phone?: string; email?: string; role: string; avatar: string } | null;
   onLogout: () => void;
 }
 
@@ -110,7 +110,7 @@ export default function Header({
         <Link
           href="/"
           className="flex items-center gap-2.5 shrink-0 group"
-          aria-label="VisaBD Home"
+          aria-label="WorkVisaBd Home"
         >
           <div className="relative flex size-9 items-center justify-center rounded-lg border border-brand-800 bg-brand-900 text-white transition-transform duration-300 group-hover:-translate-y-0.5 sm:size-11">
             <Compass className="size-[22px] text-white" strokeWidth={1.8} />
@@ -118,7 +118,7 @@ export default function Header({
           </div>
           <div className="flex items-center">
             <span className="font-display text-lg font-extrabold tracking-[-0.04em] text-slate-950 sm:text-[23px]">
-              Visa<span className="text-brand-600">BD</span>
+              WorkVisa<span className="text-brand-600">Bd</span>
             </span>
           </div>
         </Link>
@@ -328,8 +328,8 @@ export default function Header({
                     <p className="text-xs font-bold text-slate-900">
                       {user.name}
                     </p>
-                    <p className="text-[11px] text-slate-500 font-mono">
-                      {user.phone}
+                    <p className="text-[11px] text-slate-500 font-mono truncate">
+                      {user.phone || user.email}
                     </p>
                   </div>
                   <button

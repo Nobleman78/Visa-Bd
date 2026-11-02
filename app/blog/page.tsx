@@ -4,16 +4,11 @@ import Image from 'next/image';
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  Newspaper,
-  Calendar,
-  Clock,
   ArrowRight,
   Search,
-  Sparkles,
-  ChevronRight,
   BookOpen,
-  ArrowLeft,
 } from "lucide-react";
 import { STORIES, Story } from "../../data/stories-data";
 import { fetchPublishedStories } from "../../lib/supabase";
@@ -22,6 +17,7 @@ import Footer from "../../components/Footer";
 import TrackVisaModal from "../../components/TrackVisaModal";
 import AuthModal from "../../components/AuthModal";
 export default function BlogListingPage() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
@@ -35,7 +31,8 @@ export default function BlogListingPage() {
   }, []);
   const [user, setUser] = useState<{
     name: string;
-    phone: string;
+    phone?: string;
+    email?: string;
     role: string;
     avatar: string;
   } | null>(null);
@@ -66,8 +63,8 @@ export default function BlogListingPage() {
       <Header
         onOpenTrackModal={() => setIsTrackModalOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onSelectCountryVisa={(country) => {
-          window.location.href = `/#explore-visas`;
+        onSelectCountryVisa={() => {
+          router.push('/#explore-visas');
         }}
         user={user}
         onLogout={() => setUser(null)}
@@ -127,7 +124,7 @@ export default function BlogListingPage() {
                 className="group block bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-card hover:shadow-lift transition-all duration-300"
               >
                 <div className="grid lg:grid-cols-12 items-center">
-                  <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-[16/11] overflow-hidden bg-slate-900">
+                  <div className="lg:col-span-7 relative aspect-16/10 lg:aspect-16/11 overflow-hidden bg-slate-900">
                     <Image
                       height={1000}
                       width={1000}
@@ -194,7 +191,7 @@ export default function BlogListingPage() {
               >
                 <Link
                   href={`/blog/${story.slug}`}
-                  className="block relative aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100"
+                  className="block relative aspect-16/10 overflow-hidden rounded-2xl bg-slate-100"
                 >
                   <Image
                     src={story.coverImage}

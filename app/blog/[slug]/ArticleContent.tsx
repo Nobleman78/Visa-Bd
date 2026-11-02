@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Calendar,
   Clock,
@@ -25,11 +26,13 @@ interface Props {
 }
 
 export default function ArticleContent({ story, relatedStories }: Props) {
+  const router = useRouter();
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{
     name: string;
-    phone: string;
+    phone?: string;
+    email?: string;
     role: string;
     avatar: string;
   } | null>(null);
@@ -49,7 +52,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
         onOpenTrackModal={() => setIsTrackModalOpen(true)}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onSelectCountryVisa={() => {
-          window.location.href = '/#explore-visas';
+          router.push('/#explore-visas');
         }}
         user={user}
         onLogout={() => setUser(null)}
@@ -134,7 +137,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
           </header>
 
           {/* Hero Cover Image */}
-          <div className="mt-8 relative aspect-[16/9] overflow-hidden rounded-3xl shadow-lift bg-slate-900 border border-slate-200">
+          <div className="mt-8 relative aspect-video overflow-hidden rounded-3xl shadow-lift bg-slate-900 border border-slate-200">
             <Image
               src={story.coverImage}
               alt={story.title}
@@ -172,11 +175,11 @@ export default function ArticleContent({ story, relatedStories }: Props) {
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <a
-                  href="tel:+8809612884422"
+                  href="tel:+8801711752231"
                   className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-2"
                 >
                   <PhoneCall className="size-3.5" />
-                  <span>Call: +880 9612-884422</span>
+                  <span>Call: +8801711-752231</span>
                 </a>
                 <Link
                   href="/#explore-visas"
@@ -217,7 +220,7 @@ export default function ArticleContent({ story, relatedStories }: Props) {
                     href={`/blog/${rel.slug}`}
                     className="group block bg-white rounded-2xl p-4 border border-slate-200 shadow-card hover:shadow-lift transition-all duration-200"
                   >
-                    <div className="aspect-[16/10] overflow-hidden rounded-xl mb-3 bg-slate-100">
+                    <div className="aspect-16/10 overflow-hidden rounded-xl mb-3 bg-slate-100">
                       <Image
                         src={rel.coverImage}
                         alt={rel.title}

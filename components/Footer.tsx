@@ -1,33 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { 
-  Mail, 
-  ArrowRight, 
-  Compass, 
-  ShieldCheck, 
-  Phone, 
-  MapPin, 
+import React, { useState } from "react";
+import Link from "next/link";
+import {
+  Mail,
+  ArrowRight,
+  Compass,
+  ShieldCheck,
+  Phone,
+  MapPin,
   CheckCircle2,
   Search,
   UserCheck,
   Newspaper,
   MessageCircle,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface FooterProps {
   onOpenTrackModal?: () => void;
   onOpenAuthModal?: () => void;
 }
 
-export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProps = {}) {
-  const [email, setEmail] = useState('');
+export default function Footer({
+  onOpenTrackModal,
+  onOpenAuthModal,
+}: FooterProps = {}) {
+  const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes('@')) return;
+    if (!email || !email.includes("@")) return;
     setIsSubscribed(true);
   };
 
@@ -41,7 +44,9 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
               Subscribe to visa quota & embassy alerts
             </h3>
             <p className="mt-2 text-sm text-slate-400">
-              Receive breaking immigration policy revisions, salary guideline adjustments, and direct consulate appointment availability once a week.
+              Receive breaking immigration policy revisions, salary guideline
+              adjustments, and direct consulate appointment availability once a
+              week.
             </p>
           </div>
 
@@ -49,10 +54,15 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
             {isSubscribed ? (
               <div className="p-4 bg-emerald-950/60 border border-emerald-500/40 rounded-2xl flex items-center gap-3 text-emerald-300 text-sm font-semibold">
                 <CheckCircle2 className="size-5 shrink-0" />
-                <span>Thank you! You are subscribed to VisaBD consular alerts.</span>
+                <span>
+                  Thank you! You are subscribed to WorkVisaBd consular alerts.
+                </span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
+              <form
+                onSubmit={handleSubscribe}
+                className="flex flex-col sm:flex-row gap-3"
+              >
                 <div className="relative flex-1">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                   <input
@@ -85,24 +95,37 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
                 <Compass className="size-5 text-amber-400" />
               </div>
               <span className="font-display text-2xl font-black tracking-tight text-white">
-                Visa<span className="text-amber-400">BD</span>
+                WorkVisa<span className="text-amber-400">Bd</span>
               </span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              VisaBD is an accredited work visa and manpower consultation agency specializing in verified legal work authorizations, skilled worker permits, and embassy document attestation across 30+ destinations.
+              WorkVisaBd is an accredited work visa and manpower consultation
+              agency specializing in verified legal work authorizations, skilled
+              worker permits, and embassy document attestation across 30+
+              destinations.
             </p>
             <div className="space-y-2 pt-2 text-xs text-slate-300">
               <div className="flex items-center gap-2.5">
                 <MapPin className="size-4 text-amber-400 shrink-0" />
-                <span>Level 7, Concord Tower, Gulshan-2, Dhaka 1212, Bangladesh</span>
+                <span>
+                  Happiness Travels
+                  <br />
+                  55/A, HM SIDDIQUE MANSION (Level-3),
+                  <br />
+                  PURANA PALTAN, DHAKA-1000, BANGLADESH
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="size-4 text-amber-400 shrink-0" />
-                <span>Consular Hotline: <strong>+880 9612-884422</strong> (Open 9 AM – 8 PM)</span>
+                <span>
+                  Mobile: <strong>+8801711-752231</strong> (WhatsApp)
+                  <br />
+                  <strong>+8801703-994399</strong>
+                </span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="size-4 text-amber-400 shrink-0" />
-                <span>support@visabd.com • caseworkers@visabd.com</span>
+                <span>support@visabd.com</span>
               </div>
             </div>
           </div>
@@ -114,32 +137,50 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
-                <Link href="/visa/japan/specified-skilled-worker-visa" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/japan/specified-skilled-worker-visa"
+                  className="hover:text-white transition-colors"
+                >
                   Japan SSW Work Visa
                 </Link>
               </li>
               <li>
-                <Link href="/visa/malaysia/malaysia-single-entry-business-visa-express" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/malaysia/malaysia-single-entry-business-visa-express"
+                  className="hover:text-white transition-colors"
+                >
                   Malaysia Express Work Visa
                 </Link>
               </li>
               <li>
-                <Link href="/visa/united-arab-emirates/green-golden-residence-visa" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/united-arab-emirates/green-golden-residence-visa"
+                  className="hover:text-white transition-colors"
+                >
                   UAE Green & Golden Residence
                 </Link>
               </li>
               <li>
-                <Link href="/visa/singapore/employment-pass-s-pass" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/singapore/employment-pass-s-pass"
+                  className="hover:text-white transition-colors"
+                >
                   Singapore Employment Pass
                 </Link>
               </li>
               <li>
-                <Link href="/visa/saudi-arabia/professional-work-visa-svp" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/saudi-arabia/professional-work-visa-svp"
+                  className="hover:text-white transition-colors"
+                >
                   Saudi Arabia Skilled Visa
                 </Link>
               </li>
               <li>
-                <Link href="/country" className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1">
+                <Link
+                  href="/country"
+                  className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1"
+                >
                   <span>Explore All Asia Programs</span>
                   <ArrowRight className="size-3" />
                 </Link>
@@ -154,32 +195,50 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
-                <Link href="/visa/germany/chancenkarte-opportunity-card" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/germany/chancenkarte-opportunity-card"
+                  className="hover:text-white transition-colors"
+                >
                   Germany Opportunity Card
                 </Link>
               </li>
               <li>
-                <Link href="/visa/united-kingdom/skilled-worker-visa" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/united-kingdom/skilled-worker-visa"
+                  className="hover:text-white transition-colors"
+                >
                   UK Skilled Worker Visa
                 </Link>
               </li>
               <li>
-                <Link href="/visa/romania/eu-work-authorization-aviz-de-munca" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/romania/eu-work-authorization-aviz-de-munca"
+                  className="hover:text-white transition-colors"
+                >
                   Romania EU Work Permit
                 </Link>
               </li>
               <li>
-                <Link href="/visa/canada/lmia-work-permit-global-talent" className="hover:text-white transition-colors">
+                <Link
+                  href="/visa/canada/lmia-work-permit-global-talent"
+                  className="hover:text-white transition-colors"
+                >
                   Canada LMIA Work Permit
                 </Link>
               </li>
               <li>
-                <Link href="/#explore-visas" className="hover:text-white transition-colors">
+                <Link
+                  href="/#explore-visas"
+                  className="hover:text-white transition-colors"
+                >
                   Continental Pathways
                 </Link>
               </li>
               <li>
-                <Link href="/country" className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1">
+                <Link
+                  href="/country"
+                  className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1"
+                >
                   <span>View All 90+ Countries</span>
                   <ArrowRight className="size-3" />
                 </Link>
@@ -204,7 +263,10 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
                     <span>Track Visa Application</span>
                   </button>
                 ) : (
-                  <Link href="/#explore-visas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <Link
+                    href="/#explore-visas"
+                    className="hover:text-white transition-colors flex items-center gap-1.5"
+                  >
                     <Search className="size-3.5 text-amber-400" />
                     <span>Track Visa Application</span>
                   </Link>
@@ -221,36 +283,45 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
                     <span>Candidate Portal Login</span>
                   </button>
                 ) : (
-                  <Link href="/" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <Link
+                    href="/"
+                    className="hover:text-white transition-colors flex items-center gap-1.5"
+                  >
                     <UserCheck className="size-3.5 text-amber-400" />
                     <span>Candidate Portal Login</span>
                   </Link>
                 )}
               </li>
               <li>
-                <Link href="/blog" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Link
+                  href="/blog"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
                   <Newspaper className="size-3.5 text-amber-400" />
                   <span>Immigration News & Blogs</span>
                 </Link>
               </li>
               <li>
-                <Link href="/#why-choose" className="hover:text-white transition-colors flex items-center gap-1.5">
+                <Link
+                  href="/#why-choose"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
                   <ShieldCheck className="size-3.5 text-amber-400" />
                   <span>Accreditation & Standards</span>
                 </Link>
               </li>
               <li>
                 <a
-                  href="tel:+8809612884422"
+                  href="tel:+8801711752231"
                   className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
                   <Phone className="size-3.5 text-amber-400" />
-                  <span>Call Hotline: +880 9612-884422</span>
+                  <span>Call: +8801711-752231</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="https://wa.me/8809612884422?text=Hello%20VisaBD,%20I%20would%20like%20to%20inquire%20about%20overseas%20work%20visa%20services."
+                  href="https://wa.me/8801711752231?text=Hello%20WorkVisaBd,%20I%20would%20like%20to%20inquire%20about%20overseas%20work%20visa%20services."
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-emerald-300 text-emerald-400 font-semibold transition-colors flex items-center gap-1.5"
@@ -267,17 +338,29 @@ export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProp
         <div className="py-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <ShieldCheck className="size-4 text-emerald-400" />
-            <span>Govt. Approved Recruiting Agency RL-1842 | BMET License No. 4920/2026</span>
+            <span>CIVIL AVIATION LICENSE NO: 0017360 </span>
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/blog" className="hover:text-white transition-colors">Policy Updates</Link>
-            <Link href="/#why-choose" className="hover:text-white transition-colors">Consular Representation</Link>
-            <Link href="/country" className="hover:text-white transition-colors">Country Directory</Link>
+            <Link href="/blog" className="hover:text-white transition-colors">
+              Policy Updates
+            </Link>
+            <Link
+              href="/#why-choose"
+              className="hover:text-white transition-colors"
+            >
+              Consular Representation
+            </Link>
+            <Link
+              href="/country"
+              className="hover:text-white transition-colors"
+            >
+              Country Directory
+            </Link>
           </div>
 
           <p className="text-slate-500">
-            © 2026 VisaBD Agency Ltd. All rights reserved.
+            © 2026 WorkVisaBd Agency Ltd. All rights reserved.
           </p>
         </div>
       </div>

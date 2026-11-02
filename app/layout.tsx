@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "VisaBD — Find Your Work Visa & Global Immigration Agency",
+  title: "WorkVisaBd — Find Your Work Visa & Global Immigration Agency",
   description: "Fast-track legal employment visas, skilled worker permits, and permanent residency pathways across Asia, Middle East, Europe, Africa and Americas.",
   keywords: [
     "Work Visa", 
@@ -10,12 +10,12 @@ export const metadata: Metadata = {
     "Germany Opportunity Card", 
     "UK Skilled Worker", 
     "UAE Green Visa", 
-    "VisaBD", 
+    "WorkVisaBd", 
     "Immigration Agency", 
     "Track Work Visa"
   ],
   openGraph: {
-    title: "VisaBD — Find Your Work Visa",
+    title: "WorkVisaBd — Find Your Work Visa",
     description: "Legal employment visas, job search authorizations, and verified embassy document processing.",
     type: "website",
   },

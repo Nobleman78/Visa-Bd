@@ -39,9 +39,9 @@ export async function generateMetadata({ params }: PageProps) {
   const visa = visas.find(
     (v) => v.countrySlug === country && v.slug === slug
   );
-  if (!visa) return { title: 'Visa Not Found | VisaBD' };
+  if (!visa) return { title: 'Visa Not Found | WorkVisaBd' };
   return {
-    title: `${visa.visaTitle} — ${visa.country} | VisaBD`,
+    title: `${visa.visaTitle} — ${visa.country} | WorkVisaBd`,
     description: visa.overview,
   };
 }

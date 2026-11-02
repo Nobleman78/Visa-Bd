@@ -50,7 +50,8 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{
     name: string;
-    phone: string;
+    phone?: string;
+    email?: string;
     role: string;
     avatar: string;
   } | null>(null);

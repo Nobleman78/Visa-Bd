@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import HeroSearch from '../components/HeroSearch';
 import ExploreWorkVisa from '../components/ExploreWorkVisa';
@@ -20,10 +20,26 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{
     name: string;
-    phone: string;
+    phone?: string;
+    email?: string;
     role: string;
     avatar: string;
   } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('visabd_user');
+      if (stored) setUser(JSON.parse(stored));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('visabd_user');
+    localStorage.removeItem('visabd_supabase_session');
+    setUser(null);
+  };
 
   // Handle header country selection
   const handleSelectCountryFromHeader = (countryName: string) => {
@@ -39,7 +55,7 @@ export default function Home() {
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onSelectCountryVisa={handleSelectCountryFromHeader}
         user={user}
-        onLogout={() => setUser(null)}
+        onLogout={handleLogout}
       />
 
       <main className="flex-1">

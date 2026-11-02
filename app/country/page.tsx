@@ -17,7 +17,7 @@ export default function CountriesPage() {
   const router = useRouter();
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; phone: string; role: string; avatar: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; phone?: string; email?: string; role: string; avatar: string } | null>(null);
   const [visas, setVisas] = useState<WorkVisa[]>([]);
 
   useEffect(() => {

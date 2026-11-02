@@ -79,7 +79,7 @@ export async function fetchPublishedStories(table: 'blogs' | 'stories' = 'blogs'
         content: String(row.content ?? ''),
         coverImage: String(row.cover_image ?? ''),
         author: {
-          name: String(author.name ?? 'VisaBD Editorial Team'),
+          name: String(author.name ?? 'WorkVisaBd Editorial Team'),
           role: String(author.role ?? 'Editorial'),
           avatar: String(author.avatar ?? ''),
         },
