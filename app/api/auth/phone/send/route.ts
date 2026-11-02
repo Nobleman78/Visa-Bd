@@ -85,16 +85,30 @@ export async function POST(request: NextRequest) {
     }, { status: 502 });
   }
   const smsBody = await smsResponse.text();
-  let providerFailed = !smsResponse.ok || /error|invalid|failed/i.test(smsBody);
+  let providerFailed = !smsResponse.ok;
+  type SmsProviderResult = {
+    response_code?: number | string;
+    error_message?: string;
+    success_message?: string;
+  };
+  let providerResult: SmsProviderResult | null = null;
+
   try {
-    const providerResult = JSON.parse(smsBody) as {
-      response_code?: number | string;
-      error_message?: string;
-    };
-    const successfulCodes = ['1000', '202'];
-    providerFailed = !successfulCodes.includes(String(providerResult.response_code));
+    providerResult = JSON.parse(smsBody) as SmsProviderResult;
   } catch {
-    // Plain-text provider responses are handled below.
+    providerResult = null;
+  }
+
+  if (providerResult) {
+    const responseCode = String(providerResult.response_code ?? '').trim();
+    const successfulCodes = ['1000', '202'];
+    const submittedSuccessfully = /submitted successfully/i.test(providerResult.success_message ?? '');
+    providerFailed = !successfulCodes.includes(responseCode) && !submittedSuccessfully;
+  } else {
+    providerFailed = /error|invalid|failed/i.test(smsBody);
+    if (!providerFailed && smsResponse.ok && !smsBody.trim()) {
+      providerFailed = true;
+    }
   }
   if (providerFailed) {
     console.error('BulkSMSBD OTP delivery failed', {
