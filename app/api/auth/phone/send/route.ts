@@ -25,7 +25,14 @@ export async function POST(request: NextRequest) {
   const apiUrl = process.env.BULKSMSBD_API_URL?.trim() || 'https://bulksmsbd.net/api/smsapi';
   const senderId = process.env.BULKSMSBD_SENDER_ID?.trim() || process.env.senderId?.trim();
   if (!apiKey || !senderId) {
-    return NextResponse.json({ error: 'SMS service is not configured. Add BULKSMSBD_SENDER_ID to .env.local.' }, { status: 500 });
+    console.error('BulkSMSBD configuration missing', {
+      apiKeyConfigured: Boolean(apiKey),
+      senderIdConfigured: Boolean(senderId),
+      environment: process.env.NODE_ENV,
+    });
+    return NextResponse.json({
+      error: 'SMS service is not configured for this environment. Configure BULKSMSBD_API_KEY and BULKSMSBD_SENDER_ID.',
+    }, { status: 500 });
   }
 
   const code = String(randomInt(100000, 1000000));
@@ -90,6 +97,10 @@ export async function POST(request: NextRequest) {
     // Plain-text provider responses are handled below.
   }
   if (providerFailed) {
+    console.error('BulkSMSBD OTP delivery failed', {
+      status: smsResponse.status,
+      response: smsBody.slice(0, 500),
+    });
     await fetch(`${supabaseUrl}/rest/v1/phone_otp_challenges?phone=eq.${encodeURIComponent(normalizedPhone)}`, {
       method: 'DELETE',
       headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
