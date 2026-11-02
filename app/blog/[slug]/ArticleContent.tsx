@@ -242,7 +242,10 @@ export default function ArticleContent({ story, relatedStories }: Props) {
         </article>
       </main>
 
-      <Footer />
+      <Footer
+        onOpenTrackModal={() => setIsTrackModalOpen(true)}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+      />
 
       {/* Modals */}
       <TrackVisaModal

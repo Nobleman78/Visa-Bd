@@ -78,7 +78,10 @@ export default function CountriesPage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer
+        onOpenTrackModal={() => setIsTrackModalOpen(true)}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+      />
       <TrackVisaModal isOpen={isTrackModalOpen} onClose={() => setIsTrackModalOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLoginSuccess={setUser} />
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { 
   Mail, 
   ArrowRight, 
@@ -9,10 +10,18 @@ import {
   Phone, 
   MapPin, 
   CheckCircle2,
-  ExternalLink
+  Search,
+  UserCheck,
+  Newspaper,
+  MessageCircle,
 } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  onOpenTrackModal?: () => void;
+  onOpenAuthModal?: () => void;
+}
+
+export default function Footer({ onOpenTrackModal, onOpenAuthModal }: FooterProps = {}) {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
@@ -25,7 +34,7 @@ export default function Footer() {
   return (
     <footer className="bg-slate-950 text-white border-t border-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Newsletter Subscription Row (Visaboo style) */}
+        {/* Newsletter Subscription Row */}
         <div className="py-12 border-b border-white/10 grid items-center gap-8 lg:grid-cols-2">
           <div>
             <h3 className="text-2xl sm:text-3xl font-bold font-display text-white">
@@ -104,12 +113,37 @@ export default function Footer() {
               Asia & Middle East
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Japan SSW-1 & SSW-2</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Japan Tech & Engineering</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">UAE Green Work Residence Visa</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">UAE 10-Year Golden Work Visa</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Singapore Employment Pass</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Saudi Arabia Qiwa & Takamol</a></li>
+              <li>
+                <Link href="/visa/japan/specified-skilled-worker-visa" className="hover:text-white transition-colors">
+                  Japan SSW Work Visa
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/malaysia/malaysia-single-entry-business-visa-express" className="hover:text-white transition-colors">
+                  Malaysia Express Work Visa
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/united-arab-emirates/green-golden-residence-visa" className="hover:text-white transition-colors">
+                  UAE Green & Golden Residence
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/singapore/employment-pass-s-pass" className="hover:text-white transition-colors">
+                  Singapore Employment Pass
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/saudi-arabia/professional-work-visa-svp" className="hover:text-white transition-colors">
+                  Saudi Arabia Skilled Visa
+                </Link>
+              </li>
+              <li>
+                <Link href="/country" className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1">
+                  <span>Explore All Asia Programs</span>
+                  <ArrowRight className="size-3" />
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -119,27 +153,112 @@ export default function Footer() {
               Europe & Americas
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Germany Opportunity Card</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Germany EU Blue Card</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">UK Skilled Worker (Tier 2)</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">UK Health & Care Worker</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Romania EU Schengen Permit</a></li>
-              <li><a href="#explore-visas" className="hover:text-white transition-colors">Canada LMIA & GTS Work</a></li>
+              <li>
+                <Link href="/visa/germany/chancenkarte-opportunity-card" className="hover:text-white transition-colors">
+                  Germany Opportunity Card
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/united-kingdom/skilled-worker-visa" className="hover:text-white transition-colors">
+                  UK Skilled Worker Visa
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/romania/eu-work-authorization-aviz-de-munca" className="hover:text-white transition-colors">
+                  Romania EU Work Permit
+                </Link>
+              </li>
+              <li>
+                <Link href="/visa/canada/lmia-work-permit-global-talent" className="hover:text-white transition-colors">
+                  Canada LMIA Work Permit
+                </Link>
+              </li>
+              <li>
+                <Link href="/#explore-visas" className="hover:text-white transition-colors">
+                  Continental Pathways
+                </Link>
+              </li>
+              <li>
+                <Link href="/country" className="hover:text-amber-400 text-amber-500 font-semibold transition-colors flex items-center gap-1">
+                  <span>View All 90+ Countries</span>
+                  <ArrowRight className="size-3" />
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 4: Candidate Services & Trust */}
+          {/* Column 4: Candidate Services & Support */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 font-display mb-4">
               Candidate Services
             </h4>
             <ul className="space-y-2.5 text-xs text-slate-400">
-              <li><a href="#" className="hover:text-white transition-colors">Document Attestation (MOFA)</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Police Clearance Assistance</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Official Japanese/German Translation</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Prometric Exam Coaching</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">IELTS for UKVI Registration</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blocked Account Setup Support</a></li>
+              <li>
+                {onOpenTrackModal ? (
+                  <button
+                    type="button"
+                    onClick={onOpenTrackModal}
+                    className="hover:text-white transition-colors text-left flex items-center gap-1.5"
+                  >
+                    <Search className="size-3.5 text-amber-400" />
+                    <span>Track Visa Application</span>
+                  </button>
+                ) : (
+                  <Link href="/#explore-visas" className="hover:text-white transition-colors flex items-center gap-1.5">
+                    <Search className="size-3.5 text-amber-400" />
+                    <span>Track Visa Application</span>
+                  </Link>
+                )}
+              </li>
+              <li>
+                {onOpenAuthModal ? (
+                  <button
+                    type="button"
+                    onClick={onOpenAuthModal}
+                    className="hover:text-white transition-colors text-left flex items-center gap-1.5"
+                  >
+                    <UserCheck className="size-3.5 text-amber-400" />
+                    <span>Candidate Portal Login</span>
+                  </button>
+                ) : (
+                  <Link href="/" className="hover:text-white transition-colors flex items-center gap-1.5">
+                    <UserCheck className="size-3.5 text-amber-400" />
+                    <span>Candidate Portal Login</span>
+                  </Link>
+                )}
+              </li>
+              <li>
+                <Link href="/blog" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <Newspaper className="size-3.5 text-amber-400" />
+                  <span>Immigration News & Blogs</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/#why-choose" className="hover:text-white transition-colors flex items-center gap-1.5">
+                  <ShieldCheck className="size-3.5 text-amber-400" />
+                  <span>Accreditation & Standards</span>
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="tel:+8809612884422"
+                  className="hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  <Phone className="size-3.5 text-amber-400" />
+                  <span>Call Hotline: +880 9612-884422</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://wa.me/8809612884422?text=Hello%20VisaBD,%20I%20would%20like%20to%20inquire%20about%20overseas%20work%20visa%20services."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-emerald-300 text-emerald-400 font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <MessageCircle className="size-3.5" />
+                  <span>WhatsApp Liaison Desk</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -152,9 +271,9 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Representation</a>
-            <a href="#" className="hover:text-white transition-colors">Security Disclaimers</a>
+            <Link href="/blog" className="hover:text-white transition-colors">Policy Updates</Link>
+            <Link href="/#why-choose" className="hover:text-white transition-colors">Consular Representation</Link>
+            <Link href="/country" className="hover:text-white transition-colors">Country Directory</Link>
           </div>
 
           <p className="text-slate-500">

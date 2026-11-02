@@ -60,7 +60,10 @@ export default function Home() {
       </main>
 
       {/* 7. Global Footer */}
-      <Footer />
+      <Footer
+        onOpenTrackModal={() => setIsTrackModalOpen(true)}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+      />
 
       {/* MODALS */}
       {/* Track Work Visa Modal */}

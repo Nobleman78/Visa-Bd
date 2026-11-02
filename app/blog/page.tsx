@@ -262,7 +262,10 @@ export default function BlogListingPage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer
+        onOpenTrackModal={() => setIsTrackModalOpen(true)}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+      />
 
       {/* Modals */}
       <TrackVisaModal
