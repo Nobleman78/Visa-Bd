@@ -37,6 +37,18 @@ export default function BlogListingPage() {
     avatar: string;
   } | null>(null);
 
+  useEffect(() => {
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('visabd_user');
+        setUser(stored ? JSON.parse(stored) : null);
+      } catch {
+        setUser(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(restoreTimer);
+  }, []);
+
   const categories = [
     "All",
     "Work Policy Updates",
@@ -67,7 +79,11 @@ export default function BlogListingPage() {
           router.push('/#explore-visas');
         }}
         user={user}
-        onLogout={() => setUser(null)}
+        onLogout={() => {
+          localStorage.removeItem('visabd_user');
+          localStorage.removeItem('visabd_supabase_session');
+          setUser(null);
+        }}
       />
 
       <main className="flex-1 py-12 lg:py-16">

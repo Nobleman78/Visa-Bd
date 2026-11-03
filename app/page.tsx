@@ -15,7 +15,6 @@ import AuthModal from '../components/AuthModal';
 export default function Home() {
   // Modal states
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
-  const [currentTrackingId, setCurrentTrackingId] = useState('VBD-2026-89412');
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{
@@ -27,12 +26,15 @@ export default function Home() {
   } | null>(null);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('visabd_user');
-      if (stored) setUser(JSON.parse(stored));
-    } catch {
-      // ignore
-    }
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('visabd_user');
+        setUser(stored ? JSON.parse(stored) : null);
+      } catch {
+        setUser(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(restoreTimer);
   }, []);
 
   const handleLogout = () => {
@@ -86,7 +88,6 @@ export default function Home() {
       <TrackVisaModal
         isOpen={isTrackModalOpen}
         onClose={() => setIsTrackModalOpen(false)}
-        initialTrackingId={currentTrackingId}
       />
 
       {/* Phone Number + OTP Verification Modal */}

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -36,6 +36,18 @@ export default function ArticleContent({ story, relatedStories }: Props) {
     role: string;
     avatar: string;
   } | null>(null);
+
+  useEffect(() => {
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('visabd_user');
+        setUser(stored ? JSON.parse(stored) : null);
+      } catch {
+        setUser(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(restoreTimer);
+  }, []);
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleShare = () => {
@@ -55,7 +67,11 @@ export default function ArticleContent({ story, relatedStories }: Props) {
           router.push('/#explore-visas');
         }}
         user={user}
-        onLogout={() => setUser(null)}
+        onLogout={() => {
+          localStorage.removeItem('visabd_user');
+          localStorage.removeItem('visabd_supabase_session');
+          setUser(null);
+        }}
       />
 
       <main className="flex-1 py-10 lg:py-16">

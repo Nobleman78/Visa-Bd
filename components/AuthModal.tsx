@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, CheckCircle2, Phone, RotateCw, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Mail, Phone, RotateCw, X } from 'lucide-react';
 import { storeSupabaseSession } from '../lib/supabase';
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
@@ -17,16 +17,23 @@ async function readJsonResponse<T>(response: Response): Promise<T> {
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (user: { name: string; phone?: string; email?: string; role: string; avatar: string }) => void;
+  onLoginSuccess: (user: { id?: string; name: string; phone?: string; email?: string; role: string; avatar: string }) => void;
 }
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
   const [step, setStep] = useState<'input' | 'otp' | 'success'>('input');
-  const [phoneNumber, setPhoneNumber] = useState('+8801712345678');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [inputMethod, setInputMethod] = useState<'email' | 'phone'>('email');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [countdown, setCountdown] = useState(60);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [isEmailSigningIn, setIsEmailSigningIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -82,7 +89,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
       });
       const result = await readJsonResponse<{
         session?: { access_token: string; refresh_token: string };
-        user?: { name: string; phone: string };
+        user?: { id: string; name: string; phone: string };
         error?: string;
       }>(response);
 
@@ -93,12 +100,14 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
       storeSupabaseSession(result.session);
       const loggedInUser = {
+        id: result.user.id,
         name: result.user.name || 'Verified Applicant',
         phone: result.user.phone || phoneNumber,
         email: '',
         role: 'Verified Applicant',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+        avatar: '',
       };
+
       localStorage.setItem('visabd_user', JSON.stringify(loggedInUser));
       setStep('success');
 
@@ -111,6 +120,82 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
       setErrorMessage(err instanceof Error ? err.message : 'Verification failed.');
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setIsEmailSigningIn(true);
+    try {
+      const response = await fetch('/api/auth/email/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await readJsonResponse<{
+        session?: { access_token: string; refresh_token: string };
+        user?: { id: string; email?: string; role?: string };
+        error?: string;
+      }>(response);
+      if (!response.ok || !result.session || !result.user) {
+        setErrorMessage(result.error || 'Invalid email or password.');
+        return;
+      }
+      storeSupabaseSession(result.session);
+      const loggedInUser = {
+        id: result.user.id,
+        name: result.user.email?.split('@')[0] || 'Applicant',
+        email: result.user.email || email.trim().toLowerCase(),
+        role: result.user.role || 'Applicant',
+        avatar: '',
+      };
+
+      localStorage.setItem('visabd_user', JSON.stringify(loggedInUser));
+      setStep('success');
+      setTimeout(() => {
+        onLoginSuccess(loggedInUser);
+        onClose();
+        setStep('input');
+      }, 1200);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Unable to sign in.');
+    } finally {
+      setIsEmailSigningIn(false);
+    }
+  };
+
+  const handleEmailRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match.');
+      return;
+    }
+    setIsEmailSigningIn(true);
+    try {
+      const response = await fetch('/api/auth/email/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, email, password }),
+      });
+      const result = await readJsonResponse<{ message?: string; error?: string; login?: boolean }>(response);
+      if (!response.ok) {
+        setErrorMessage(result.error || 'Unable to create your account.');
+        return;
+      }
+      setConfirmPassword('');
+      setPassword('');
+      setErrorMessage('');
+      setStep('success');
+      setTimeout(() => {
+        setAuthMode('login');
+        setStep('input');
+      }, 1200);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Unable to create your account.');
+    } finally {
+      setIsEmailSigningIn(false);
     }
   };
 
@@ -135,14 +220,14 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
             </span>
           </div>
           <h3 className="pr-8 text-xl font-bold text-slate-950 font-display">
-            {step === 'input' && 'Sign in with Mobile'}
+            {step === 'input' && (authMode === 'login' ? 'Sign in to your account' : 'Create your account')}
             {step === 'otp' && 'Verify Phone Number'}
-            {step === 'success' && 'Authentication Successful!'}
+            {step === 'success' && (authMode === 'register' ? 'Account Created Successfully!' : 'Authentication Successful!')}
           </h3>
           <p className="mt-1 text-xs text-slate-500">
-            {step === 'input' && 'Access visa tracking, document lockers, and consular updates.'}
+            {step === 'input' && (authMode === 'login' ? 'Access visa tracking, document lockers, and consular updates.' : 'Register with email to track and manage your visa applications.')}
             {step === 'otp' && `Enter the 6-digit code sent to ${phoneNumber}`}
-            {step === 'success' && 'Redirecting to your applicant dashboard...'}
+            {step === 'success' && (authMode === 'register' ? 'Your account is ready. Redirecting to sign in...' : 'Redirecting to your applicant dashboard...')}
           </p>
         </div>
 
@@ -154,6 +239,86 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModal
 
         <div className="p-6">
           {step === 'input' && (
+            <>
+              <div className="mb-5 grid grid-cols-2 rounded-xl bg-slate-100 p-1" role="tablist" aria-label="Authentication method">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={inputMethod === 'email'}
+                  onClick={() => {
+                    setInputMethod('email');
+                    setErrorMessage('');
+                  }}
+                  className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
+                    inputMethod === 'email'
+                      ? 'bg-white text-brand-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Mail className="size-4" />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={inputMethod === 'phone'}
+                  onClick={() => {
+                    setInputMethod('phone');
+                    setAuthMode('login');
+                    setErrorMessage('');
+                  }}
+                  className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-colors ${
+                    inputMethod === 'phone'
+                      ? 'bg-white text-brand-700 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Phone className="size-4" />
+                  Phone
+                </button>
+              </div>
+
+              {inputMethod === 'email' && (
+            <form onSubmit={authMode === 'login' ? handleEmailLogin : handleEmailRegister} className="space-y-4">
+              {authMode === 'register' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">Full name</label>
+                  <input type="text" required minLength={2} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your full name" autoComplete="name" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@gmail.com" autoComplete="email" className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">Password</label>
+                <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" autoComplete={authMode === 'login' ? 'current-password' : 'new-password'} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+              </div>
+              {authMode === 'register' && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">Confirm password</label>
+                  <input type="password" required minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your password" autoComplete="new-password" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500" />
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={isEmailSigningIn}
+                className="w-full py-3.5 bg-brand-700 hover:bg-brand-800 disabled:opacity-60 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm"
+              >
+                {isEmailSigningIn ? <><RotateCw className="size-4 animate-spin" /><span>{authMode === 'login' ? 'Signing in...' : 'Creating account...'}</span></> : <><span>{authMode === 'login' ? 'Continue with Email' : 'Create Account'}</span><ArrowRight className="size-4" /></>}
+              </button>
+              <button type="button" onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setErrorMessage(''); }} className="w-full text-sm font-bold text-brand-700">
+                {authMode === 'login' ? 'Create an account' : 'Already have an account? Sign in'}
+              </button>
+            </form>
+              )}
+            </>
+          )}
+
+          {step === 'input' && inputMethod === 'phone' && (
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">

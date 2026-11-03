@@ -24,8 +24,7 @@ export async function fetchPublishedVisas() {
     });
     if (!response.ok) return [];
     const rows = await response.json() as Array<Record<string, unknown>>;
-    if (!rows.length) return [];
-    const backendVisas = rows.map((row) => ({
+    return rows.map((row) => ({
       id: String(row.id ?? ''),
       slug: String(row.slug ?? ''),
       countrySlug: String(row.country_slug ?? ''),
@@ -51,7 +50,6 @@ export async function fetchPublishedVisas() {
       requiredDocuments: Array.isArray(row.required_documents) ? row.required_documents.map(String) : [],
       applicationStages: Array.isArray(row.application_stages) ? row.application_stages.map(String) : [],
     }));
-    return backendVisas;
   } catch (error) {
     console.error('Unable to load published visas.', error);
     return [];
@@ -117,33 +115,17 @@ export async function createSubmission(data: Record<string, unknown>) {
   const accessToken = getStoredAccessToken();
   const response = await fetch(`${url}/rest/v1/submissions`, {
     method: 'POST',
-    headers: {
-      ...restHeaders(accessToken || undefined),
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
+    headers: { ...restHeaders(accessToken || undefined), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
     body: JSON.stringify(data),
   });
-  if (!response.ok) {
-    const body = await response.text();
-    try {
-      const parsed = JSON.parse(body) as { message?: string };
-      throw new Error(parsed.message || body);
-    } catch {
-      throw new Error(body || 'Submission was rejected by Supabase.');
-    }
-  }
+  if (!response.ok) throw new Error(await response.text() || 'Submission was rejected by Supabase.');
 }
 
 export async function createAppointment(data: Record<string, unknown>) {
   if (!url || !key) throw new Error('Supabase is not configured.');
   const response = await fetch(`${url}/rest/v1/appointments`, {
     method: 'POST',
-    headers: {
-      ...restHeaders(),
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
+    headers: { ...restHeaders(), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
     body: JSON.stringify(data),
   });
   if (!response.ok) throw new Error(await response.text());
@@ -151,18 +133,34 @@ export async function createAppointment(data: Record<string, unknown>) {
 
 export async function fetchTrackedSubmission(trackingId: string) {
   const accessToken = getStoredAccessToken();
-  if (!accessToken) throw new Error('Please log in before tracking an application.');
   const response = await fetch(`/api/submissions/track?tracking_id=${encodeURIComponent(trackingId)}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
     cache: 'no-store',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
   });
-  if (!response.ok) {
-    const body = await response.json().catch(() => null) as { error?: string } | null;
-    if (response.status === 401) localStorage.removeItem('visabd_supabase_session');
-    throw new Error(body?.error || 'Unable to track this application.');
-  }
-  const result = await response.json() as { submission?: Record<string, unknown> | null };
-  return result.submission ?? null;
+  if (!response.ok) throw new Error(await response.text() || 'Unable to track this application.');
+  const result = await response.json() as {
+    submission?: Record<string, unknown> | null;
+    submissions?: Array<Record<string, unknown>>;
+  };
+  return result.submission ?? result.submissions?.[0] ?? null;
+}
+
+export async function fetchSubmissionByContact(contact: { id?: string; email?: string; phone?: string }) {
+  const params = new URLSearchParams();
+  if (contact.id) params.set('user_id', contact.id);
+  else if (contact.email) params.set('email', contact.email);
+  else if (contact.phone) params.set('phone', contact.phone);
+  const accessToken = getStoredAccessToken();
+  const response = await fetch(`/api/submissions/track?${params.toString()}`, {
+    cache: 'no-store',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+  });
+  if (!response.ok) throw new Error(await response.text() || 'Unable to find your application.');
+  const result = await response.json() as {
+    submission?: Record<string, unknown> | null;
+    submissions?: Array<Record<string, unknown>>;
+  };
+  return result.submission ?? result.submissions?.[0] ?? null;
 }
 
 export async function uploadSubmissionDocuments(formData: FormData, trackingId: string) {
@@ -174,10 +172,7 @@ export async function uploadSubmissionDocuments(formData: FormData, trackingId: 
     headers: { Authorization: `Bearer ${accessToken}` },
     body: formData,
   });
-  const result = await response.json() as {
-    documents?: Record<string, { path: string; name: string; type: string }>;
-    error?: string;
-  };
+  const result = await response.json() as { documents?: Record<string, { path: string; name: string; type: string }>; error?: string };
   if (!response.ok) throw new Error(result.error || 'Document upload failed.');
   return result.documents || {};
 }

@@ -18,14 +18,13 @@ import {
 } from "lucide-react";
 import { POPULAR_COUNTRIES_BY_REGION, WorkVisa } from "../data/visa-data";
 import CountryFlag from "./CountryFlag";
-import Image from "next/image";
 import { fetchPublishedVisas } from "../lib/supabase";
 
 interface HeaderProps {
   onOpenTrackModal: () => void;
   onOpenAuthModal: () => void;
   onSelectCountryVisa: (countryName: string) => void;
-  user: { name: string; phone?: string; email?: string; role: string; avatar: string } | null;
+  user: { id?: string; name: string; phone?: string; email?: string; role: string; avatar: string } | null;
   onLogout: () => void;
 }
 
@@ -104,7 +103,7 @@ export default function Header({
     }`;
 
   return (
-    <header className="sticky top-0 z-[100] w-full bg-[#eff6ff]">
+    <header className="sticky top-0 z-100 w-full bg-brand-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo */}
         <Link
@@ -113,7 +112,7 @@ export default function Header({
           aria-label="WorkVisaBd Home"
         >
           <div className="relative flex size-9 items-center justify-center rounded-lg border border-brand-800 bg-brand-900 text-white transition-transform duration-300 group-hover:-translate-y-0.5 sm:size-11">
-            <Compass className="size-[22px] text-white" strokeWidth={1.8} />
+            <Compass className="size-5.5 text-white" strokeWidth={1.8} />
             <span className="absolute bottom-1 right-1 size-1.5 rounded-full bg-amber-400 ring-2 ring-brand-900" />
           </div>
           <div className="flex items-center">
@@ -161,7 +160,7 @@ export default function Header({
             {visaDropdownOpen && (
               <div
                 onMouseLeave={() => setVisaDropdownOpen(false)}
-                className="absolute top-full left-0 mt-2 w-[34rem] bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden p-2 z-50"
+                className="absolute top-full left-0 mt-2 w-136 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden p-2 z-50"
                 role="menu"
               >
                 {/* Region tabs */}
@@ -252,6 +251,15 @@ export default function Header({
                     <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
                     <span>Free pre-screening by our legal consultants</span>
                   </div>
+                  {typeof window !== "undefined" &&
+                    localStorage.getItem("visabd_latest_application_id") && (
+                      <p suppressHydrationWarning className="px-3 pt-2 pb-1 text-[11px] font-semibold text-slate-500">
+                        Application ID:{" "}
+                        <span className="font-mono text-brand-700">
+                          {localStorage.getItem("visabd_latest_application_id")}
+                        </span>
+                      </p>
+                    )}
                   <button
                     type="button"
                     onClick={() => scrollToSection("explore-visas")}
@@ -304,13 +312,12 @@ export default function Header({
                 aria-haspopup="true"
                 className="flex items-center gap-2 pl-2 pr-3.5 py-1.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-sm"
               >
-                <Image
-                  height={1000}
-                  width={1000}
-                  src={user.avatar}
-                  alt={user.name}
-                  className="size-7 rounded-full object-cover ring-2 ring-amber-400"
-                />
+                <span
+                  aria-hidden="true"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-xs font-black uppercase text-slate-900 ring-2 ring-amber-300"
+                >
+                  {user.name.trim().charAt(0).toUpperCase() || "U"}
+                </span>
                 <div className="text-left hidden md:block">
                   <p className="text-xs font-bold leading-none">
                     {user.name.split(" ")[0]}
@@ -337,6 +344,9 @@ export default function Header({
                     onClick={() => {
                       setUserDropdownOpen(false);
                       onOpenTrackModal();
+                      window.dispatchEvent(new CustomEvent("visabd:open-my-application", {
+                        detail: { id: user.id, email: user.email, phone: user.phone },
+                      }));
                     }}
                     className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 rounded-xl transition-colors"
                   >

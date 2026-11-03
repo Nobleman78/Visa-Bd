@@ -18,6 +18,18 @@ export default function CountriesPage() {
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; phone?: string; email?: string; role: string; avatar: string } | null>(null);
+
+  useEffect(() => {
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem('visabd_user');
+        setUser(stored ? JSON.parse(stored) : null);
+      } catch {
+        setUser(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(restoreTimer);
+  }, []);
   const [visas, setVisas] = useState<WorkVisa[]>([]);
 
   useEffect(() => {
@@ -40,7 +52,11 @@ export default function CountriesPage() {
           if (match) router.push(`/visa/${match.countrySlug}/${match.slug}`);
         }}
         user={user}
-        onLogout={() => setUser(null)}
+        onLogout={() => {
+          localStorage.removeItem('visabd_user');
+          localStorage.removeItem('visabd_supabase_session');
+          setUser(null);
+        }}
       />
 
       <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">

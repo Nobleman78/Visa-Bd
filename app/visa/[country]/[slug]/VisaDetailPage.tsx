@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -60,6 +60,18 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
     avatar: string;
   } | null>(null);
 
+  useEffect(() => {
+    const restoreTimer = window.setTimeout(() => {
+      try {
+        const stored = localStorage.getItem("visabd_user");
+        setUser(stored ? JSON.parse(stored) : null);
+      } catch {
+        setUser(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(restoreTimer);
+  }, []);
+
   // Application form
   const [form, setForm] = useState({
     name: "",
@@ -106,7 +118,17 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
       setIsSubmitting(false);
       return;
     }
+    const storedUser = (() => {
+      try {
+        const value = JSON.parse(localStorage.getItem("visabd_user") || "null") as { id?: string } | null;
+        return value;
+      } catch {
+        return null;
+      }
+    })();
+
     createSubmission({
+      user_id: storedUser?.id || null,
       tracking_id: trackId,
       name: form.name,
       phone: form.phone,
@@ -123,7 +145,8 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
       status: "Under Review",
     })
       .then(() => {
-        setSuccessId(trackId);
+      localStorage.setItem("visabd_latest_application_id", trackId);
+      setSuccessId(trackId);
         setIsSubmitting(false);
         setActiveTab("overview");
       })
@@ -163,7 +186,11 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
           if (match) router.push(`/visa/${match.countrySlug}/${match.slug}`);
         }}
         user={user}
-        onLogout={() => setUser(null)}
+        onLogout={() => {
+          localStorage.removeItem("visabd_user");
+          localStorage.removeItem("visabd_supabase_session");
+          setUser(null);
+        }}
       />
 
       <main className="flex-1">

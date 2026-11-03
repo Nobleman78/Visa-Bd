@@ -1,24 +1,46 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, X, AlertCircle } from 'lucide-react';
-import { fetchTrackedSubmission, getStoredAccessToken } from '../lib/supabase';
+import { fetchSubmissionByContact, fetchTrackedSubmission } from '../lib/supabase';
 
 interface TrackVisaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTrackingId?: string;
 }
 
-export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: TrackVisaModalProps) {
-  const [trackingInput, setTrackingInput] = useState(initialTrackingId || 'VBD-2026-89412');
-  const [errorMessage, setErrorMessage] = useState(() =>
-    typeof window !== 'undefined' && !getStoredAccessToken()
-      ? 'Please log in before tracking an application.'
-      : '',
-  );
+export default function TrackVisaModal({ isOpen, onClose }: TrackVisaModalProps) {
+  const [trackingInput, setTrackingInput] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [application, setApplication] = useState<Record<string, unknown> | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    const handleOpenMyApplication = (event: Event) => {
+      const contact = (event as CustomEvent<{ id?: string; email?: string; phone?: string }>).detail;
+      void (async () => {
+        setIsSearching(true);
+        setErrorMessage('');
+        setApplication(null);
+        try {
+          const submission = await fetchSubmissionByContact(contact);
+          if (!submission) {
+            setErrorMessage('No application found for your account.');
+            return;
+          }
+          const trackingId = String(submission.tracking_id ?? '');
+          setTrackingInput(trackingId);
+          setApplication(submission);
+        } catch (error) {
+          setErrorMessage(error instanceof Error ? error.message : 'Unable to find your application.');
+        } finally {
+          setIsSearching(false);
+        }
+      })();
+    };
+    window.addEventListener('visabd:open-my-application', handleOpenMyApplication);
+    return () => window.removeEventListener('visabd:open-my-application', handleOpenMyApplication);
+  }, []);
 
   const handleClose = () => {
     setApplication(null);
@@ -32,11 +54,6 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanId = trackingInput.trim().toUpperCase();
-    if (!getStoredAccessToken()) {
-      setApplication(null);
-      setErrorMessage('Please log in before tracking an application.');
-      return;
-    }
     setIsSearching(true);
     setErrorMessage('');
     try {
@@ -110,6 +127,9 @@ export default function TrackVisaModal({ isOpen, onClose, initialTrackingId }: T
           {application && (
             <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
               <p className="font-bold text-slate-900">Application found</p>
+              <p className="mt-1 font-bold text-slate-900">
+                Application ID: {String(application.tracking_id ?? application.application_id ?? application.id ?? trackingInput.trim().toUpperCase())}
+              </p>
               <p className="mt-1 text-slate-600">Status: {String(application.status ?? 'Under Review')}</p>
               <p className="text-slate-600">Visa: {String(application.visa_title ?? application.visa ?? '')}</p>
               <p className="text-slate-600">Country: {String(application.country ?? '')}</p>

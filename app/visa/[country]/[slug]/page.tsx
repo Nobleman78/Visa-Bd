@@ -4,8 +4,6 @@ import { connection } from 'next/server';
 import VisaDetailPage from './VisaDetailPage';
 import { fetchPublishedVisas } from '../../../../lib/supabase';
 
-export const instant = false;
-
 interface PageProps {
   params: Promise<{ country: string; slug: string }>;
 }
@@ -33,6 +31,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  await connection();
   const { country, slug } = await params;
   const apiVisas = await fetchPublishedVisas();
   const visas = apiVisas;
