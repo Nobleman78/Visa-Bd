@@ -510,11 +510,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">
-                          Full Name *
+                          Full Name
                         </label>
                         <input
                           type="text"
-                          required
                           placeholder="Tariqul Islam"
                           value={form.name}
                           onChange={(e) =>
@@ -543,11 +542,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">
-                          Email Address *
+                          Email Address
                         </label>
                         <input
                           type="email"
-                          required
                           placeholder="name@example.com"
                           value={form.email}
                           onChange={(e) =>
@@ -558,11 +556,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">
-                          NID / National ID *
+                          NID / National ID
                         </label>
                         <input
                           type="text"
-                          required
                           placeholder="National ID number"
                           value={form.nid}
                           onChange={(e) =>
@@ -573,11 +570,10 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 font-display">
-                          Date of Birth *
+                          Date of Birth
                         </label>
                         <input
                           type="date"
-                          required
                           value={form.dateOfBirth}
                           onChange={(e) =>
                             setForm({ ...form, dateOfBirth: e.target.value })
@@ -653,12 +649,13 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                             className="block p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors"
                           >
                             <span className="block text-xs font-bold text-slate-700 mb-2">
-                              {label} *
+                              {label}
+                              {name === "passport-photo" || name === "passport-copy" ? " *" : ""}
                             </span>
                             <input
                               type="file"
                               name={name}
-                              required
+                              required={name === "passport-photo" || name === "passport-copy"}
                               accept="image/jpeg,image/png,application/pdf"
                               onChange={(event) => {
                                 const file = event.target.files?.[0];
@@ -863,14 +860,14 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                 </h4>
                 <div className="mt-5 flex items-center gap-4">
                   <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-black text-brand-700">
-                    MU
+                    TBO
                   </div>
                   <div>
                     <p className="font-bold text-slate-900">
-                      Md. Tarek Bin Omor
+                      Tarek Bin Omor
                     </p>
                     <p className="text-xs text-slate-500">
-                      Malaysia desk · since May 2020
+                      Global Desk · since May 2019
                     </p>
                   </div>
                 </div>
@@ -890,11 +887,11 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     +8801703-994399
                   </a>
                   <a
-                    href="mailto:support@visabd.com"
+                    href="mailto:happinesstravelsbd@gmail.com"
                     className="flex items-center gap-3 py-3 text-slate-600 hover:text-brand-700"
                   >
                     <Mail className="size-4 text-brand-600" />
-                    support@visabd.com
+                    happinesstravelsbd@gmail.com
                   </a>
                   <p className="flex items-start gap-3 py-3 text-slate-600">
                     <MapPin className="mt-0.5 size-4 shrink-0 text-brand-600" />
@@ -913,7 +910,7 @@ export default function VisaDetailPage({ visa, relatedVisas }: Props) {
                     WhatsApp
                   </a>
                   <a
-                    href="mailto:support@visabd.com"
+                    href="mailto:happinesstravelsbd@gmail.com"
                     className="flex items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-sm font-bold text-white"
                   >
                     <MessageCircle className="size-4" />
